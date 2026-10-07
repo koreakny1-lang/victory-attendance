@@ -70,13 +70,36 @@ display:flex;
 justify-content:space-between;
 align-items:center;
 padding:14px 4px;
-border-bottom:1px solid #edf0f4
+border-bottom:1px solid #edf0f4;
+gap:15px
 }
 
 .attendance-item:last-child{border-bottom:0}
 .att-name{font-weight:800;color:#062b5c;font-size:17px}
 .att-detail{font-size:13px;color:#758195;margin-top:5px}
-.att-time{font-weight:800;color:#079447;white-space:nowrap}
+
+.att-right{
+display:flex;
+align-items:center;
+gap:10px;
+}
+
+.att-time{
+font-weight:800;
+color:#079447;
+white-space:nowrap
+}
+
+.att-delete{
+border:0;
+background:#ffecec;
+color:#d63232;
+padding:8px 11px;
+border-radius:8px;
+font-weight:700;
+cursor:pointer;
+white-space:nowrap
+}
 
 .search{margin-bottom:16px}
 
@@ -121,6 +144,15 @@ padding:24px;max-height:90vh;overflow:auto
 .student{display:block}
 .buttons{margin-top:12px}
 header h1{font-size:17px}
+
+.attendance-item{
+align-items:flex-start
+}
+
+.att-right{
+flex-direction:column;
+align-items:flex-end
+}
 }
 </style>
 </head>
@@ -159,8 +191,6 @@ onkeydown="if(event.key==='Enter') login()">
 
 <div class="container">
 
-<!-- 현황 숫자 -->
-
 <div class="dashboard">
 
 <div class="stat">
@@ -181,8 +211,6 @@ onkeydown="if(event.key==='Enter') login()">
 </div>
 
 
-<!-- 오늘 출석현황 -->
-
 <div class="card">
 
 <div class="attendance-head">
@@ -194,8 +222,6 @@ onkeydown="if(event.key==='Enter') login()">
 
 </div>
 
-
-<!-- 수련생 등록 -->
 
 <div class="card">
 
@@ -249,8 +275,6 @@ onkeydown="if(event.key==='Enter') login()">
 </div>
 
 
-<!-- 수련생 관리 -->
-
 <div class="card">
 
 <h2>수련생 관리</h2>
@@ -267,8 +291,6 @@ oninput="renderStudents()">
 </div>
 </div>
 
-
-<!-- 수정창 -->
 
 <div id="editModal" class="modal">
 
@@ -501,6 +523,10 @@ left.appendChild(name);
 left.appendChild(detail);
 
 
+const right=document.createElement("div");
+right.className="att-right";
+
+
 const time=document.createElement("div");
 time.className="att-time";
 
@@ -515,12 +541,79 @@ minute:"2-digit"
 );
 
 
+const deleteButton=document.createElement("button");
+deleteButton.className="att-delete";
+deleteButton.textContent="출석 삭제";
+
+deleteButton.onclick=()=>{
+deleteAttendance(a);
+};
+
+
+right.appendChild(time);
+right.appendChild(deleteButton);
+
 row.appendChild(left);
-row.appendChild(time);
+row.appendChild(right);
 
 box.appendChild(row);
 
 });
+
+}
+
+
+async function deleteAttendance(a){
+
+const ok=confirm(
+a.name+
+" 수련생의 오늘 출석 기록만 삭제하시겠습니까?\n\n"+
+"학생 정보와 부모님 알림 등록은 삭제되지 않습니다."
+);
+
+if(!ok)return;
+
+
+try{
+
+const result=await rpc(
+"admin_delete_attendance",
+{
+admin_password:adminPassword,
+attendance_id:a.attendance_id
+}
+);
+
+
+if(!result.success){
+
+alert(
+result.message ||
+"출석 기록을 삭제하지 못했습니다."
+);
+
+return;
+}
+
+
+await loadAll();
+
+alert(
+a.name+
+" 수련생의 오늘 출석 기록을 삭제했습니다.\n"+
+"다시 출석할 수 있습니다."
+);
+
+
+}catch(error){
+
+console.error(error);
+
+alert(
+"출석 삭제 중 오류가 발생했습니다."
+);
+
+}
 
 }
 
@@ -753,7 +846,8 @@ message.textContent="수정 중 오류가 발생했습니다.";
 async function deleteStudent(s){
 
 if(!confirm(
-s.name+" 수련생을 정말 삭제하시겠습니까?\n출석 기록도 함께 삭제됩니다."
+s.name+" 수련생을 정말 삭제하시겠습니까?\n\n"+
+"주의: 학생 자체를 삭제하면 출석 기록과 부모님 알림 등록도 함께 삭제됩니다."
 ))return;
 
 try{
