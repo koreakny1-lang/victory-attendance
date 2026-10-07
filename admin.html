@@ -3,219 +3,124 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>용인대 승리태권도 관리자</title>
 
 <style>
 *{box-sizing:border-box}
+body{margin:0;font-family:Arial,"Noto Sans KR",sans-serif;background:#f4f7fb;color:#17283d}
+header{background:#062b5c;color:white;padding:18px}
+header .inner{max-width:1100px;margin:auto;display:flex;justify-content:space-between;align-items:center}
+header h1{margin:0;font-size:22px}
+header button{background:white;color:#062b5c;border:0;padding:9px 15px;border-radius:9px;font-weight:700;cursor:pointer}
 
-body{
-  margin:0;
-  font-family:Arial,"Noto Sans KR",sans-serif;
-  background:#f4f7fb;
-  color:#17283d;
-}
+.container{max-width:1100px;margin:25px auto;padding:0 20px}
+.card{background:white;border-radius:18px;padding:24px;margin-bottom:22px;box-shadow:0 5px 20px rgba(0,0,0,.06)}
+h2{margin:0 0 18px;color:#062b5c}
 
-header{
-  background:#062b5c;
-  color:white;
-  padding:20px;
-}
-
-header .inner{
-  max-width:1100px;
-  margin:auto;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-
-header h1{
-  margin:0;
-  font-size:23px;
-}
-
-header button{
-  background:white;
-  color:#062b5c;
-  border:0;
-  padding:10px 16px;
-  border-radius:10px;
-  font-weight:700;
-  cursor:pointer;
-}
-
-.container{
-  max-width:1100px;
-  margin:30px auto;
-  padding:0 20px;
-}
-
-.card{
-  background:white;
-  border-radius:20px;
-  padding:25px;
-  margin-bottom:25px;
-  box-shadow:0 5px 20px rgba(0,0,0,.06);
-}
-
-h2{
-  margin-top:0;
-  color:#062b5c;
-}
-
-.login{
-  max-width:420px;
-  margin:100px auto;
-}
+.login{max-width:420px;margin:100px auto}
 
 input,select{
-  width:100%;
-  padding:13px;
-  border:1px solid #d5dde7;
-  border-radius:10px;
-  font-size:16px;
-  background:white;
+width:100%;padding:12px;border:1px solid #d5dde7;border-radius:9px;font-size:15px;background:white
 }
 
-.form-grid{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:14px;
-}
-
-.field label{
-  display:block;
-  font-size:14px;
-  font-weight:700;
-  margin-bottom:6px;
-}
-
-.full{
-  grid-column:1/-1;
-}
+.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:13px}
+.field label{display:block;font-size:13px;font-weight:700;margin-bottom:6px}
+.full{grid-column:1/-1}
 
 .primary{
-  width:100%;
-  border:0;
-  border-radius:12px;
-  background:#0b5bd3;
-  color:white;
-  padding:14px;
-  font-size:17px;
-  font-weight:700;
-  cursor:pointer;
+width:100%;border:0;border-radius:10px;background:#0b5bd3;color:white;
+padding:13px;font-size:16px;font-weight:700;cursor:pointer
 }
 
-.search{
-  margin-bottom:18px;
+.dashboard{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:14px;
+margin-bottom:22px
 }
+
+.stat{
+background:white;
+border-radius:18px;
+padding:22px;
+box-shadow:0 5px 20px rgba(0,0,0,.06);
+text-align:center
+}
+
+.stat-title{font-size:14px;color:#748195;margin-bottom:8px}
+.stat-number{font-size:34px;font-weight:800;color:#062b5c}
+.stat-number.blue{color:#0b5bd3}
+.stat-number.red{color:#df3e3e}
+
+.attendance-head{
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:10px;
+margin-bottom:15px
+}
+
+.refresh{
+border:0;background:#edf3ff;color:#0b5bd3;
+padding:9px 13px;border-radius:9px;font-weight:700;cursor:pointer
+}
+
+.attendance-item{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:14px 4px;
+border-bottom:1px solid #edf0f4
+}
+
+.attendance-item:last-child{border-bottom:0}
+.att-name{font-weight:800;color:#062b5c;font-size:17px}
+.att-detail{font-size:13px;color:#758195;margin-top:5px}
+.att-time{font-weight:800;color:#079447;white-space:nowrap}
+
+.search{margin-bottom:16px}
 
 .student{
-  border:1px solid #e1e6ed;
-  border-radius:14px;
-  padding:16px;
-  margin-bottom:10px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:15px;
+border:1px solid #e1e6ed;border-radius:13px;padding:15px;margin-bottom:10px;
+display:flex;align-items:center;justify-content:space-between;gap:15px
 }
 
-.student-info{
-  flex:1;
-}
+.student-info{flex:1}
+.student-name{font-size:17px;font-weight:800;color:#062b5c}
+.student-detail{margin-top:5px;font-size:13px;color:#6c7887;line-height:1.6}
 
-.student-name{
-  font-size:18px;
-  font-weight:800;
-  color:#062b5c;
-}
+.buttons{display:flex;gap:7px}
+.edit,.delete{border:0;padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:700}
+.edit{background:#e8f0ff;color:#0b5bd3}
+.delete{background:#ffecec;color:#d63232}
 
-.student-detail{
-  margin-top:5px;
-  font-size:14px;
-  color:#6c7887;
-  line-height:1.6;
-}
-
-.buttons{
-  display:flex;
-  gap:7px;
-}
-
-.edit,.delete{
-  border:0;
-  padding:9px 13px;
-  border-radius:9px;
-  cursor:pointer;
-  font-weight:700;
-}
-
-.edit{
-  background:#e8f0ff;
-  color:#0b5bd3;
-}
-
-.delete{
-  background:#ffecec;
-  color:#d63232;
-}
-
-.count{
-  color:#6d7b8c;
-  margin-bottom:15px;
-}
-
-.message{
-  margin-top:15px;
-  font-weight:700;
-  text-align:center;
-}
-
+.count{color:#6d7b8c;margin-bottom:13px}
+.message{margin-top:14px;font-weight:700;text-align:center}
 .success{color:#079447}
 .error{color:#df3e3e}
 
 .modal{
-  display:none;
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.45);
-  justify-content:center;
-  align-items:center;
-  padding:20px;
+display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);
+justify-content:center;align-items:center;padding:20px
 }
 
 .modal-box{
-  background:white;
-  width:100%;
-  max-width:520px;
-  border-radius:20px;
-  padding:25px;
-  max-height:90vh;
-  overflow:auto;
+background:white;width:100%;max-width:520px;border-radius:18px;
+padding:24px;max-height:90vh;overflow:auto
 }
 
-.modal-buttons{
-  display:flex;
-  gap:10px;
-  margin-top:18px;
-}
+.modal-buttons{display:flex;gap:10px;margin-top:18px}
+.cancel{width:100%;border:0;padding:13px;border-radius:10px;cursor:pointer;font-weight:700}
 
-.cancel{
-  width:100%;
-  border:0;
-  padding:13px;
-  border-radius:10px;
-  cursor:pointer;
-  font-weight:700;
-}
+.empty{text-align:center;color:#8994a3;padding:25px}
 
 @media(max-width:650px){
-  .form-grid{grid-template-columns:1fr}
-  .full{grid-column:auto}
-  .student{display:block}
-  .buttons{margin-top:12px}
+.form-grid{grid-template-columns:1fr}
+.full{grid-column:auto}
+.dashboard{grid-template-columns:1fr}
+.student{display:block}
+.buttons{margin-top:12px}
+header h1{font-size:17px}
 }
 </style>
 </head>
@@ -223,41 +128,74 @@ input,select{
 <body>
 
 <div id="loginScreen" class="container">
-  <div class="card login">
-    <h2>관리자 로그인</h2>
+<div class="card login">
 
-    <p>용인대 승리태권도 출석관리</p>
+<h2>관리자 로그인</h2>
+<p>용인대 승리태권도 출석관리</p>
 
-    <input
-      id="password"
-      type="password"
-      inputmode="numeric"
-      placeholder="관리자 비밀번호"
-      onkeydown="if(event.key==='Enter') login()"
-    >
+<input id="password" type="password" inputmode="numeric"
+placeholder="관리자 비밀번호"
+onkeydown="if(event.key==='Enter') login()">
 
-    <br><br>
+<br><br>
 
-    <button class="primary" onclick="login()">
-      로그인
-    </button>
+<button class="primary" onclick="login()">로그인</button>
 
-    <div id="loginMessage" class="message"></div>
-  </div>
+<div id="loginMessage" class="message"></div>
+
+</div>
 </div>
 
 
 <div id="adminScreen" style="display:none">
 
 <header>
-  <div class="inner">
-    <h1>용인대 승리태권도 출석관리</h1>
-    <button onclick="logout()">로그아웃</button>
-  </div>
+<div class="inner">
+<h1>용인대 승리태권도 출석관리</h1>
+<button onclick="logout()">로그아웃</button>
+</div>
 </header>
 
 
 <div class="container">
+
+<!-- 현황 숫자 -->
+
+<div class="dashboard">
+
+<div class="stat">
+<div class="stat-title">전체 재원생</div>
+<div id="totalStudents" class="stat-number">0</div>
+</div>
+
+<div class="stat">
+<div class="stat-title">오늘 출석</div>
+<div id="todayCount" class="stat-number blue">0</div>
+</div>
+
+<div class="stat">
+<div class="stat-title">오늘 미출석</div>
+<div id="absentCount" class="stat-number red">0</div>
+</div>
+
+</div>
+
+
+<!-- 오늘 출석현황 -->
+
+<div class="card">
+
+<div class="attendance-head">
+<h2 style="margin:0">오늘 출석현황</h2>
+<button class="refresh" onclick="loadAll()">새로고침</button>
+</div>
+
+<div id="todayAttendance"></div>
+
+</div>
+
+
+<!-- 수련생 등록 -->
 
 <div class="card">
 
@@ -272,21 +210,12 @@ input,select{
 
 <div class="field">
 <label>출석번호 4자리 *</label>
-<input
-  id="pin"
-  maxlength="4"
-  inputmode="numeric"
-  placeholder="예: 1234"
->
+<input id="pin" maxlength="4" inputmode="numeric" placeholder="예: 1234">
 </div>
 
 <div class="field">
 <label>학부모 연락처</label>
-<input
-  id="phone"
-  inputmode="tel"
-  placeholder="010-1234-5678"
->
+<input id="phone" inputmode="tel" placeholder="010-1234-5678">
 </div>
 
 <div class="field">
@@ -310,9 +239,7 @@ input,select{
 </div>
 
 <div class="field full">
-<button class="primary" onclick="addStudent()">
-수련생 등록
-</button>
+<button class="primary" onclick="addStudent()">수련생 등록</button>
 </div>
 
 </div>
@@ -322,19 +249,17 @@ input,select{
 </div>
 
 
+<!-- 수련생 관리 -->
+
 <div class="card">
 
 <h2>수련생 관리</h2>
 
-<input
-  id="search"
-  class="search"
-  placeholder="이름 · 학교 · 반 · 출석번호 검색"
-  oninput="renderStudents()"
->
+<input id="search" class="search"
+placeholder="이름 · 학교 · 반 · 출석번호 검색"
+oninput="renderStudents()">
 
 <div id="count" class="count"></div>
-
 <div id="studentList"></div>
 
 </div>
@@ -342,6 +267,8 @@ input,select{
 </div>
 </div>
 
+
+<!-- 수정창 -->
 
 <div id="editModal" class="modal">
 
@@ -400,15 +327,8 @@ input,select{
 </div>
 
 <div class="modal-buttons">
-
-<button class="cancel" onclick="closeEdit()">
-취소
-</button>
-
-<button class="primary" onclick="saveEdit()">
-수정 저장
-</button>
-
+<button class="cancel" onclick="closeEdit()">취소</button>
+<button class="primary" onclick="saveEdit()">수정 저장</button>
 </div>
 
 <div id="editMessage" class="message"></div>
@@ -419,401 +339,448 @@ input,select{
 
 <script>
 
-const SUPABASE_URL =
-"https://ixuxlblfkoccmwqxsjbw.supabase.co";
-
-const SUPABASE_KEY =
-"sb_publishable_lmwJJaHfZzE5hXnZnF49oA__F7JpDZ8";
+const SUPABASE_URL="https://ixuxlblfkoccmwqxsjbw.supabase.co";
+const SUPABASE_KEY="sb_publishable_lmwJJaHfZzE5hXnZnF49oA__F7JpDZ8";
 
 let adminPassword="";
 let students=[];
+let todayAttendance=[];
 
 
 async function rpc(name,data){
 
-  const response=await fetch(
-    SUPABASE_URL+"/rest/v1/rpc/"+name,
-    {
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json",
-        "apikey":SUPABASE_KEY,
-        "Authorization":"Bearer "+SUPABASE_KEY
-      },
-      body:JSON.stringify(data)
-    }
-  );
+const response=await fetch(
+SUPABASE_URL+"/rest/v1/rpc/"+name,
+{
+method:"POST",
+headers:{
+"Content-Type":"application/json",
+"apikey":SUPABASE_KEY,
+"Authorization":"Bearer "+SUPABASE_KEY
+},
+body:JSON.stringify(data)
+}
+);
 
-  if(!response.ok){
-    throw new Error(await response.text());
-  }
+if(!response.ok){
+throw new Error(await response.text());
+}
 
-  return await response.json();
+return await response.json();
 }
 
 
 async function login(){
 
-  const password=
-    document.getElementById("password").value.trim();
+const password=document.getElementById("password").value.trim();
+if(!password)return;
 
-  if(!password) return;
+const message=document.getElementById("loginMessage");
 
-  const message=
-    document.getElementById("loginMessage");
+message.className="message";
+message.textContent="확인 중...";
 
-  message.className="message";
-  message.textContent="확인 중...";
+try{
 
-  try{
+adminPassword=password;
 
-    adminPassword=password;
+await loadAll();
 
-    await loadStudents();
+document.getElementById("loginScreen").style.display="none";
+document.getElementById("adminScreen").style.display="block";
 
-    document.getElementById("loginScreen").style.display="none";
-    document.getElementById("adminScreen").style.display="block";
+}catch(error){
 
-  }catch(error){
+adminPassword="";
+message.className="message error";
+message.textContent="관리자 비밀번호가 틀렸습니다.";
 
-    adminPassword="";
-
-    message.className="message error";
-    message.textContent="관리자 비밀번호가 틀렸습니다.";
-
-  }
+}
 }
 
 
 function logout(){
 
-  adminPassword="";
-  students=[];
+adminPassword="";
+students=[];
+todayAttendance=[];
 
-  document.getElementById("password").value="";
-  document.getElementById("adminScreen").style.display="none";
-  document.getElementById("loginScreen").style.display="block";
+document.getElementById("password").value="";
+document.getElementById("adminScreen").style.display="none";
+document.getElementById("loginScreen").style.display="block";
+
+}
+
+
+async function loadAll(){
+
+await loadStudents();
+await loadTodayAttendance();
+updateDashboard();
+
 }
 
 
 async function loadStudents(){
 
-  students=await rpc(
-    "admin_students",
-    {
-      admin_password:adminPassword
-    }
-  );
+students=await rpc(
+"admin_students",
+{admin_password:adminPassword}
+);
 
-  renderStudents();
+renderStudents();
+
+}
+
+
+async function loadTodayAttendance(){
+
+todayAttendance=await rpc(
+"admin_today_attendance",
+{admin_password:adminPassword}
+);
+
+renderTodayAttendance();
+
+}
+
+
+function updateDashboard(){
+
+const activeStudents=
+students.filter(s=>s.status==="재원");
+
+const total=activeStudents.length;
+const attended=todayAttendance.length;
+
+document.getElementById("totalStudents").textContent=total;
+document.getElementById("todayCount").textContent=attended;
+document.getElementById("absentCount").textContent=
+Math.max(0,total-attended);
+
+}
+
+
+function renderTodayAttendance(){
+
+const box=document.getElementById("todayAttendance");
+box.innerHTML="";
+
+if(todayAttendance.length===0){
+
+box.innerHTML=
+'<div class="empty">아직 오늘 출석한 수련생이 없습니다.</div>';
+
+return;
+}
+
+
+todayAttendance.forEach(a=>{
+
+const row=document.createElement("div");
+row.className="attendance-item";
+
+const left=document.createElement("div");
+
+const name=document.createElement("div");
+name.className="att-name";
+name.textContent=a.name;
+
+const detail=document.createElement("div");
+detail.className="att-detail";
+
+detail.textContent=[
+a.class_name,
+a.school,
+a.grade,
+a.belt,
+"출석번호 "+a.pin
+].filter(Boolean).join(" · ");
+
+left.appendChild(name);
+left.appendChild(detail);
+
+
+const time=document.createElement("div");
+time.className="att-time";
+
+const date=new Date(a.checked_at);
+
+time.textContent=date.toLocaleTimeString(
+"ko-KR",
+{
+hour:"2-digit",
+minute:"2-digit"
+}
+);
+
+
+row.appendChild(left);
+row.appendChild(time);
+
+box.appendChild(row);
+
+});
+
 }
 
 
 async function addStudent(){
 
-  const name=
-    document.getElementById("name").value.trim();
+const name=document.getElementById("name").value.trim();
+const pin=document.getElementById("pin").value.trim();
+const message=document.getElementById("addMessage");
 
-  const pin=
-    document.getElementById("pin").value.trim();
+if(!name){
+message.className="message error";
+message.textContent="이름을 입력해주세요.";
+return;
+}
 
-  const message=
-    document.getElementById("addMessage");
+if(!/^\d{4}$/.test(pin)){
+message.className="message error";
+message.textContent="출석번호는 숫자 4자리로 입력해주세요.";
+return;
+}
 
-  if(!name){
+message.className="message";
+message.textContent="등록 중...";
 
-    message.className="message error";
-    message.textContent="이름을 입력해주세요.";
-    return;
-  }
+try{
 
-  if(!/^\d{4}$/.test(pin)){
+const result=await rpc(
+"admin_add_student",
+{
+admin_password:adminPassword,
+student_name:name,
+student_pin:pin,
+student_parent_phone:document.getElementById("phone").value.trim(),
+student_class_name:document.getElementById("className").value.trim(),
+student_school:document.getElementById("school").value.trim(),
+student_grade:document.getElementById("grade").value.trim(),
+student_belt:document.getElementById("belt").value.trim()
+}
+);
 
-    message.className="message error";
-    message.textContent="출석번호는 숫자 4자리로 입력해주세요.";
-    return;
-  }
+if(!result.success){
+message.className="message error";
+message.textContent=result.message;
+return;
+}
 
-  message.className="message";
-  message.textContent="등록 중...";
+message.className="message success";
+message.textContent="수련생 등록 완료!";
 
-  try{
+["name","pin","phone","className","school","grade","belt"]
+.forEach(id=>document.getElementById(id).value="");
 
-    const result=await rpc(
-      "admin_add_student",
-      {
-        admin_password:adminPassword,
-        student_name:name,
-        student_pin:pin,
-        student_parent_phone:
-          document.getElementById("phone").value.trim(),
-        student_class_name:
-          document.getElementById("className").value.trim(),
-        student_school:
-          document.getElementById("school").value.trim(),
-        student_grade:
-          document.getElementById("grade").value.trim(),
-        student_belt:
-          document.getElementById("belt").value.trim()
-      }
-    );
+await loadAll();
 
-    if(!result.success){
+}catch(error){
 
-      message.className="message error";
-      message.textContent=result.message;
-      return;
-    }
+message.className="message error";
+message.textContent="등록 중 오류가 발생했습니다.";
 
-    message.className="message success";
-    message.textContent="수련생 등록 완료!";
+}
 
-    [
-      "name",
-      "pin",
-      "phone",
-      "className",
-      "school",
-      "grade",
-      "belt"
-    ].forEach(id=>{
-      document.getElementById(id).value="";
-    });
-
-    await loadStudents();
-
-  }catch(error){
-
-    message.className="message error";
-    message.textContent="등록 중 오류가 발생했습니다.";
-
-  }
 }
 
 
 function renderStudents(){
 
-  const keyword=
-    document.getElementById("search").value
-      .trim()
-      .toLowerCase();
+const search=document.getElementById("search");
+if(!search)return;
 
-  const filtered=students.filter(s=>{
+const keyword=search.value.trim().toLowerCase();
 
-    const text=[
-      s.name,
-      s.pin,
-      s.parent_phone,
-      s.class_name,
-      s.school,
-      s.grade,
-      s.belt,
-      s.status
-    ].join(" ").toLowerCase();
+const filtered=students.filter(s=>{
 
-    return text.includes(keyword);
-  });
+const text=[
+s.name,s.pin,s.parent_phone,s.class_name,
+s.school,s.grade,s.belt,s.status
+].join(" ").toLowerCase();
+
+return text.includes(keyword);
+
+});
 
 
-  document.getElementById("count").textContent=
-    "총 "+filtered.length+"명";
+document.getElementById("count").textContent=
+"총 "+filtered.length+"명";
 
 
-  const list=
-    document.getElementById("studentList");
-
-  list.innerHTML="";
+const list=document.getElementById("studentList");
+list.innerHTML="";
 
 
-  if(filtered.length===0){
+if(filtered.length===0){
 
-    list.innerHTML=
-      "<div style='color:#7a8796'>등록된 수련생이 없습니다.</div>";
+list.innerHTML=
+'<div class="empty">등록된 수련생이 없습니다.</div>';
 
-    return;
-  }
-
-
-  filtered.forEach(s=>{
-
-    const item=document.createElement("div");
-    item.className="student";
-
-    const info=document.createElement("div");
-    info.className="student-info";
-
-    const name=document.createElement("div");
-    name.className="student-name";
-    name.textContent=s.name+" · "+s.pin;
-
-    const detail=document.createElement("div");
-    detail.className="student-detail";
-
-    detail.textContent=[
-      s.class_name,
-      s.school,
-      s.grade,
-      s.belt,
-      s.parent_phone,
-      s.status
-    ].filter(Boolean).join(" · ");
-
-    info.appendChild(name);
-    info.appendChild(detail);
+return;
+}
 
 
-    const buttons=document.createElement("div");
-    buttons.className="buttons";
+filtered.forEach(s=>{
+
+const item=document.createElement("div");
+item.className="student";
+
+const info=document.createElement("div");
+info.className="student-info";
+
+const name=document.createElement("div");
+name.className="student-name";
+name.textContent=s.name+" · "+s.pin;
+
+const detail=document.createElement("div");
+detail.className="student-detail";
+
+detail.textContent=[
+s.class_name,
+s.school,
+s.grade,
+s.belt,
+s.parent_phone,
+s.status
+].filter(Boolean).join(" · ");
+
+info.appendChild(name);
+info.appendChild(detail);
 
 
-    const edit=document.createElement("button");
-    edit.className="edit";
-    edit.textContent="수정";
-    edit.onclick=()=>openEdit(s);
+const buttons=document.createElement("div");
+buttons.className="buttons";
 
 
-    const del=document.createElement("button");
-    del.className="delete";
-    del.textContent="삭제";
-    del.onclick=()=>deleteStudent(s);
+const edit=document.createElement("button");
+edit.className="edit";
+edit.textContent="수정";
+edit.onclick=()=>openEdit(s);
 
 
-    buttons.appendChild(edit);
-    buttons.appendChild(del);
+const del=document.createElement("button");
+del.className="delete";
+del.textContent="삭제";
+del.onclick=()=>deleteStudent(s);
 
-    item.appendChild(info);
-    item.appendChild(buttons);
 
-    list.appendChild(item);
+buttons.appendChild(edit);
+buttons.appendChild(del);
 
-  });
+item.appendChild(info);
+item.appendChild(buttons);
+
+list.appendChild(item);
+
+});
+
 }
 
 
 function openEdit(s){
 
-  document.getElementById("editId").value=s.id;
-  document.getElementById("editName").value=s.name || "";
-  document.getElementById("editPin").value=s.pin || "";
-  document.getElementById("editPhone").value=s.parent_phone || "";
-  document.getElementById("editClass").value=s.class_name || "";
-  document.getElementById("editSchool").value=s.school || "";
-  document.getElementById("editGrade").value=s.grade || "";
-  document.getElementById("editBelt").value=s.belt || "";
-  document.getElementById("editStatus").value=s.status || "재원";
+document.getElementById("editId").value=s.id;
+document.getElementById("editName").value=s.name||"";
+document.getElementById("editPin").value=s.pin||"";
+document.getElementById("editPhone").value=s.parent_phone||"";
+document.getElementById("editClass").value=s.class_name||"";
+document.getElementById("editSchool").value=s.school||"";
+document.getElementById("editGrade").value=s.grade||"";
+document.getElementById("editBelt").value=s.belt||"";
+document.getElementById("editStatus").value=s.status||"재원";
 
-  document.getElementById("editMessage").textContent="";
+document.getElementById("editMessage").textContent="";
+document.getElementById("editModal").style.display="flex";
 
-  document.getElementById("editModal").style.display="flex";
 }
 
 
 function closeEdit(){
-  document.getElementById("editModal").style.display="none";
+document.getElementById("editModal").style.display="none";
 }
 
 
 async function saveEdit(){
 
-  const pin=
-    document.getElementById("editPin").value.trim();
+const pin=document.getElementById("editPin").value.trim();
+const message=document.getElementById("editMessage");
 
-  const message=
-    document.getElementById("editMessage");
+if(!/^\d{4}$/.test(pin)){
+message.className="message error";
+message.textContent="출석번호는 숫자 4자리여야 합니다.";
+return;
+}
 
-  if(!/^\d{4}$/.test(pin)){
+try{
 
-    message.className="message error";
-    message.textContent="출석번호는 숫자 4자리여야 합니다.";
-    return;
-  }
+const result=await rpc(
+"admin_update_student",
+{
+admin_password:adminPassword,
+student_id:Number(document.getElementById("editId").value),
+student_name:document.getElementById("editName").value.trim(),
+student_pin:pin,
+student_parent_phone:document.getElementById("editPhone").value.trim(),
+student_class_name:document.getElementById("editClass").value.trim(),
+student_school:document.getElementById("editSchool").value.trim(),
+student_grade:document.getElementById("editGrade").value.trim(),
+student_belt:document.getElementById("editBelt").value.trim(),
+student_status:document.getElementById("editStatus").value
+}
+);
 
+if(!result.success){
+message.className="message error";
+message.textContent=result.message;
+return;
+}
 
-  try{
+await loadAll();
+closeEdit();
 
-    const result=await rpc(
-      "admin_update_student",
-      {
-        admin_password:adminPassword,
-        student_id:Number(
-          document.getElementById("editId").value
-        ),
-        student_name:
-          document.getElementById("editName").value.trim(),
-        student_pin:pin,
-        student_parent_phone:
-          document.getElementById("editPhone").value.trim(),
-        student_class_name:
-          document.getElementById("editClass").value.trim(),
-        student_school:
-          document.getElementById("editSchool").value.trim(),
-        student_grade:
-          document.getElementById("editGrade").value.trim(),
-        student_belt:
-          document.getElementById("editBelt").value.trim(),
-        student_status:
-          document.getElementById("editStatus").value
-      }
-    );
+}catch(error){
 
+message.className="message error";
+message.textContent="수정 중 오류가 발생했습니다.";
 
-    if(!result.success){
+}
 
-      message.className="message error";
-      message.textContent=result.message;
-      return;
-    }
-
-
-    await loadStudents();
-
-    closeEdit();
-
-  }catch(error){
-
-    message.className="message error";
-    message.textContent="수정 중 오류가 발생했습니다.";
-
-  }
 }
 
 
 async function deleteStudent(s){
 
-  if(!confirm(
-    s.name+" 수련생을 정말 삭제하시겠습니까?\n출석 기록도 함께 삭제됩니다."
-  )){
-    return;
-  }
+if(!confirm(
+s.name+" 수련생을 정말 삭제하시겠습니까?\n출석 기록도 함께 삭제됩니다."
+))return;
 
+try{
 
-  try{
+const result=await rpc(
+"admin_delete_student",
+{
+admin_password:adminPassword,
+student_id:s.id
+}
+);
 
-    const result=await rpc(
-      "admin_delete_student",
-      {
-        admin_password:adminPassword,
-        student_id:s.id
-      }
-    );
+if(!result.success){
+alert(result.message);
+return;
+}
 
+await loadAll();
 
-    if(!result.success){
-      alert(result.message);
-      return;
-    }
+}catch(error){
 
+alert("삭제 중 오류가 발생했습니다.");
 
-    await loadStudents();
+}
 
-  }catch(error){
-
-    alert("삭제 중 오류가 발생했습니다.");
-
-  }
 }
 
 </script>
-
 </body>
 </html>
