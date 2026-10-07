@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>승리태권도 출석 알림 등록</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, "Noto Sans KR", sans-serif;
+      background: #f5f7fb;
+      color: #17283d;
+    }
+
+    .wrap {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 60px 20px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 22px;
+      padding: 35px 25px;
+      box-shadow: 0 10px 35px rgba(0,0,0,0.08);
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 27px;
+      margin: 0 0 10px;
+    }
+
+    .sub {
+      color: #687386;
+      line-height: 1.6;
+      margin-bottom: 30px;
+    }
+
+    input {
+      width: 100%;
+      padding: 18px;
+      font-size: 28px;
+      text-align: center;
+      letter-spacing: 10px;
+      border: 2px solid #dce2ea;
+      border-radius: 14px;
+      outline: none;
+      margin-bottom: 15px;
+    }
+
+    input:focus {
+      border-color: #17283d;
+    }
+
+    button {
+      width: 100%;
+      padding: 18px;
+      border: 0;
+      border-radius: 14px;
+      background: #17283d;
+      color: white;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+    }
+
+    #result {
+      margin-top: 20px;
+      font-size: 17px;
+      font-weight: 700;
+      line-height: 1.5;
+    }
+
+    .notice {
+      margin-top: 25px;
+      font-size: 13px;
+      color: #8a94a3;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="wrap">
+  <div class="card">
+
+    <h1>🥋 용인대 승리태권도</h1>
+
+    <div class="sub">
+      자녀의 출석 알림을<br>
+      휴대폰으로 받아보세요.
+    </div>
+
+    <input
+      id="pin"
+      type="tel"
+      maxlength="4"
+      inputmode="numeric"
+      placeholder="0000"
+    >
+
+    <button id="registerBtn" onclick="registerPush()">
+      출석 알림 등록하기
+    </button>
+
+    <div id="result"></div>
+
+    <div class="notice">
+      알림 등록은 최초 1회만 하시면 됩니다.<br>
+      브라우저에서 알림 허용을 선택해주세요.
+    </div>
+
+  </div>
+</div>
+
+<script>
+
+const SUPABASE_URL =
+  "https://ixuxlblfkoccmwqxsjbw.supabase.co";
+
+const SUPABASE_KEY =
+  "sb_publishable_lmwJJaHfZzE5hXnZnF49oA__F7JpDZ8";
+
+const VAPID_PUBLIC_KEY =
+  "BOBiao0_8ypwHad3rAeVJ6m4q8A8Tt9gRTOqJEwyzJKgJ37nQ0k69fz-dQEcLcd6CQq3fu_6FSwb64o780EDqME";
+
+
+function urlBase64ToUint8Array(base64String) {
+  const padding =
+    "=".repeat((4 - base64String.length % 4) % 4);
+
+  const base64 =
+    (base64String + padding)
+      .replace(/-/g, "+")
+      .replace(/_/g, "/");
+
+  const rawData = window.atob(base64);
+
+  return Uint8Array.from(
+    [...rawData].map(char => char.charCodeAt(0))
+  );
+}
+
+
+async function registerPush() {
+
+  const pin =
+    document.getElementById("pin").value.trim();
+
+  const result =
+    document.getElementById("result");
+
+  const button =
+    document.getElementById("registerBtn");
+
+
+  if (!/^\d{4}$/.test(pin)) {
+    result.textContent =
+      "4자리 출석번호를 입력해주세요.";
+    return;
+  }
+
+
+  if (!("serviceWorker" in navigator)) {
+    result.textContent =
+      "이 브라우저에서는 알림 기능을 사용할 수 없습니다.";
+    return;
+  }
+
+
+  if (!("PushManager" in window)) {
+    result.textContent =
+      "이 기기에서는 푸시 알림을 지원하지 않습니다.";
+    return;
+  }
+
+
+  try {
+
+    button.disabled = true;
+    result.textContent =
+      "알림 등록 중입니다...";
+
+
+    const permission =
+      await Notification.requestPermission();
+
+
+    if (permission !== "granted") {
+      result.textContent =
+        "알림 권한을 허용해주세요.";
+
+      button.disabled = false;
+      return;
+    }
+
+
+    const registration =
+      await navigator.serviceWorker.register("/sw.js");
+
+
+    await navigator.serviceWorker.ready;
+
+
+    let subscription =
+      await registration.pushManager.getSubscription();
+
+
+    if (!subscription) {
+
+      subscription =
+        await registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey:
+            urlBase64ToUint8Array(
+              VAPID_PUBLIC_KEY
+            )
+        });
+
+    }
+
+
+    const json =
+      subscription.toJSON();
+
+
+    const response =
+      await fetch(
+        SUPABASE_URL +
+        "/rest/v1/rpc/register_parent_push",
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type": "application/json",
+            "apikey": SUPABASE_KEY,
+            "Authorization":
+              "Bearer " + SUPABASE_KEY
+          },
+
+          body: JSON.stringify({
+            input_pin: pin,
+            input_endpoint: json.endpoint,
+            input_p256dh: json.keys.p256dh,
+            input_auth: json.keys.auth
+          })
+        }
+      );
+
+
+    const data =
+      await response.json();
+
+
+    if (data.success) {
+
+      result.innerHTML =
+        "✅ " +
+        data.name +
+        " 수련생<br>출석 알림 등록 완료!";
+
+    } else {
+
+      result.textContent =
+        data.message ||
+        "알림 등록에 실패했습니다.";
+
+    }
+
+
+  } catch (error) {
+
+    console.error(error);
+
+    result.textContent =
+      "알림 등록 중 오류가 발생했습니다.";
+
+  }
+
+
+  button.disabled = false;
+}
+
+</script>
+
+</body>
+</html>
