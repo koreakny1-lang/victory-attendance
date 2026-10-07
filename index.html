@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#062b5c">
+
+  <title>용인대 승리태권도 출석체크</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, "Noto Sans KR", sans-serif;
+      background: #f4f7fb;
+      color: #152238;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .wrap {
+      width: 100%;
+      max-width: 520px;
+      padding: 30px 24px;
+      text-align: center;
+    }
+
+    .brand {
+      font-size: 17px;
+      font-weight: 700;
+      color: #315274;
+      margin-bottom: 8px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 34px;
+      color: #062b5c;
+      letter-spacing: -1px;
+    }
+
+    .guide {
+      margin-top: 14px;
+      margin-bottom: 28px;
+      color: #6d7b8c;
+      font-size: 17px;
+    }
+
+    .pin-box {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+
+    .dot {
+      width: 22px;
+      height: 22px;
+      border: 2px solid #b9c5d2;
+      border-radius: 50%;
+      background: white;
+    }
+
+    .dot.on {
+      background: #0b5bd3;
+      border-color: #0b5bd3;
+    }
+
+    .keypad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    .key {
+      height: 82px;
+      border-radius: 18px;
+      background: white;
+      border: 1px solid #dce3ec;
+      font-size: 30px;
+      font-weight: 700;
+      color: #17283d;
+      box-shadow: 0 3px 10px rgba(0,0,0,.05);
+    }
+
+    .key:active {
+      background: #e8eef7;
+      transform: scale(.97);
+    }
+
+    .delete {
+      color: #63758a;
+      font-size: 24px;
+    }
+
+    .confirm {
+      background: #0b5bd3;
+      color: white;
+      font-size: 20px;
+    }
+
+    .confirm:disabled {
+      opacity: .45;
+    }
+
+    .message {
+      min-height: 34px;
+      margin-top: 24px;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .success {
+      color: #079447;
+    }
+
+    .error {
+      color: #e04444;
+    }
+
+    .success-card {
+      display: none;
+      background: white;
+      border-radius: 24px;
+      padding: 38px 25px;
+      box-shadow: 0 10px 35px rgba(0,0,0,.08);
+    }
+
+    .check {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: #08a64d;
+      color: white;
+      margin: 0 auto 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 45px;
+    }
+
+    .student-name {
+      font-size: 32px;
+      font-weight: 800;
+      color: #062b5c;
+    }
+
+    .complete-text {
+      margin-top: 10px;
+      font-size: 24px;
+      color: #079447;
+      font-weight: 800;
+    }
+
+    .time {
+      margin-top: 14px;
+      color: #738093;
+      font-size: 18px;
+    }
+
+    @media (max-width: 500px) {
+      .wrap {
+        padding: 20px;
+      }
+
+      .key {
+        height: 72px;
+      }
+
+      h1 {
+        font-size: 29px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="wrap">
+
+  <div id="checkScreen">
+
+    <div class="brand">용인대 승리태권도</div>
+
+    <h1>출석체크</h1>
+
+    <div class="guide">
+      출석번호 4자리를 입력해주세요
+    </div>
+
+    <div class="pin-box">
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+    </div>
+
+    <div class="keypad">
+
+      <button class="key" onclick="press('1')">1</button>
+      <button class="key" onclick="press('2')">2</button>
+      <button class="key" onclick="press('3')">3</button>
+
+      <button class="key" onclick="press('4')">4</button>
+      <button class="key" onclick="press('5')">5</button>
+      <button class="key" onclick="press('6')">6</button>
+
+      <button class="key" onclick="press('7')">7</button>
+      <button class="key" onclick="press('8')">8</button>
+      <button class="key" onclick="press('9')">9</button>
+
+      <button class="key delete" onclick="removeNumber()">←</button>
+      <button class="key" onclick="press('0')">0</button>
+      <button id="confirmBtn" class="key confirm" onclick="checkAttendance()">
+        확인
+      </button>
+
+    </div>
+
+    <div id="message" class="message"></div>
+
+  </div>
+
+
+  <div id="successScreen" class="success-card">
+
+    <div class="check">✓</div>
+
+    <div id="studentName" class="student-name"></div>
+
+    <div class="complete-text">
+      출석 완료!
+    </div>
+
+    <div id="checkTime" class="time"></div>
+
+  </div>
+
+</div>
+
+
+<script>
+
+const SUPABASE_URL =
+  "https://ixuxlblfkoccmwqxsjbw.supabase.co";
+
+const SUPABASE_KEY =
+  "sb_publishable_lmwJJaHfZzE5hXnZnF49oA__F7JpDZ8";
+
+
+let pin = "";
+let processing = false;
+
+
+function press(number) {
+
+  if (processing) return;
+
+  if (pin.length >= 4) return;
+
+  pin += number;
+
+  updateDots();
+
+  if (pin.length === 4) {
+    document.getElementById("message").textContent =
+      "확인을 눌러주세요.";
+  }
+}
+
+
+function removeNumber() {
+
+  if (processing) return;
+
+  pin = pin.slice(0, -1);
+
+  updateDots();
+
+  document.getElementById("message").textContent = "";
+}
+
+
+function updateDots() {
+
+  const dots = document.querySelectorAll(".dot");
+
+  dots.forEach((dot, index) => {
+
+    if (index < pin.length) {
+      dot.classList.add("on");
+    } else {
+      dot.classList.remove("on");
+    }
+
+  });
+}
+
+
+async function checkAttendance() {
+
+  if (processing) return;
+
+  const message = document.getElementById("message");
+
+  if (pin.length !== 4) {
+
+    message.className = "message error";
+
+    message.textContent =
+      "출석번호 4자리를 입력해주세요.";
+
+    return;
+  }
+
+
+  processing = true;
+
+  document.getElementById("confirmBtn").disabled = true;
+
+  message.className = "message";
+
+  message.textContent = "확인 중...";
+
+
+  try {
+
+    const response = await fetch(
+      SUPABASE_URL + "/rest/v1/rpc/check_attendance",
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json",
+          "apikey": SUPABASE_KEY,
+          "Authorization": "Bearer " + SUPABASE_KEY
+        },
+
+        body: JSON.stringify({
+          input_pin: pin
+        })
+      }
+    );
+
+
+    if (!response.ok) {
+      throw new Error("server");
+    }
+
+
+    const result = await response.json();
+
+
+    if (result.success) {
+
+      showSuccess(result.name);
+
+    } else {
+
+      message.className = "message error";
+
+      if (result.already) {
+        message.textContent =
+          result.name + " 수련생은 이미 출석했습니다.";
+      } else {
+        message.textContent =
+          result.message || "출석번호를 확인해주세요.";
+      }
+
+      resetPin();
+
+    }
+
+  }
+
+  catch (error) {
+
+    message.className = "message error";
+
+    message.textContent =
+      "연결에 문제가 있습니다. 다시 시도해주세요.";
+
+    resetPin();
+
+  }
+
+  finally {
+
+    processing = false;
+
+    document.getElementById("confirmBtn").disabled = false;
+
+  }
+
+}
+
+
+function showSuccess(name) {
+
+  document.getElementById("checkScreen").style.display =
+    "none";
+
+  document.getElementById("successScreen").style.display =
+    "block";
+
+  document.getElementById("studentName").textContent =
+    name + " 수련생";
+
+  const now = new Date();
+
+  document.getElementById("checkTime").textContent =
+    now.toLocaleTimeString(
+      "ko-KR",
+      {
+        hour: "2-digit",
+        minute: "2-digit"
+      }
+    );
+
+
+  setTimeout(() => {
+
+    document.getElementById("successScreen").style.display =
+      "none";
+
+    document.getElementById("checkScreen").style.display =
+      "block";
+
+    document.getElementById("message").textContent = "";
+
+    resetPin();
+
+  }, 3000);
+
+}
+
+
+function resetPin() {
+
+  pin = "";
+
+  updateDots();
+
+}
+
+
+</script>
+
+</body>
+</html>
