@@ -889,11 +889,12 @@ async function uploadPhoto(){
   const button=
   document.getElementById("uploadBtn");
 
+  const photoMessage=
+  document.getElementById("photoMessage");
+
   button.disabled=true;
 
-  document.getElementById(
-    "photoMessage"
-  ).textContent=
+  photoMessage.textContent=
   "사진을 보내고 있습니다...";
 
   try{
@@ -909,7 +910,7 @@ async function uploadPhoto(){
     formData.append(
       "photo",
       selectedPhoto,
-      selectedPhoto.name||"attendance.jpg"
+      "attendance.jpg"
     );
 
     const response=
@@ -922,21 +923,38 @@ async function uploadPhoto(){
       }
     );
 
-    const data=
-    await response.json();
+    const raw=
+    await response.text();
+
+    let data;
+
+    try{
+
+      data=
+      JSON.parse(raw);
+
+    }catch(e){
+
+      throw new Error(
+        "서버 응답 오류 ("+
+        response.status+
+        ")"
+      );
+    }
 
     if(!response.ok || !data.success){
 
       throw new Error(
         data.message||
-        "사진 저장 실패"
+        (
+          "사진 저장 실패 ("+
+          response.status+
+          ")"
+        )
       );
-
     }
 
-    document.getElementById(
-      "photoMessage"
-    ).textContent=
+    photoMessage.textContent=
     "✅ 출석사진을 보냈습니다.";
 
     document.getElementById(
@@ -945,8 +963,7 @@ async function uploadPhoto(){
 
     document.getElementById(
       "skipBtn"
-    ).textContent=
-    "완료";
+    ).textContent="완료";
 
     setTimeout(
       finishAndReset,
@@ -955,12 +972,17 @@ async function uploadPhoto(){
 
   }catch(error){
 
-    console.error(error);
+    console.error(
+      "사진 전송 오류:",
+      error
+    );
 
-    document.getElementById(
-      "photoMessage"
-    ).textContent=
-    "사진 전송에 실패했습니다. 다시 시도해주세요.";
+    photoMessage.textContent=
+    "❌ "+
+    (
+      error.message||
+      "사진 전송에 실패했습니다."
+    );
 
     button.disabled=false;
   }
