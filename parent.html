@@ -1,120 +1,260 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>승리태권도 출석 알림 등록</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>승리태권도 학부모 출석서비스</title>
 
-  <style>
-    * {
-      box-sizing: border-box;
-    }
+<style>
+*{box-sizing:border-box}
 
-    body {
-      margin: 0;
-      font-family: Arial, "Noto Sans KR", sans-serif;
-      background: #f5f7fb;
-      color: #17283d;
-    }
+body{
+  margin:0;
+  font-family:Arial,"Noto Sans KR",sans-serif;
+  background:#f5f7fb;
+  color:#17283d;
+}
 
-    .wrap {
-      max-width: 480px;
-      margin: 0 auto;
-      padding: 60px 20px;
-    }
+.wrap{
+  max-width:480px;
+  margin:0 auto;
+  padding:40px 20px 70px;
+}
 
-    .card {
-      background: white;
-      border-radius: 22px;
-      padding: 35px 25px;
-      box-shadow: 0 10px 35px rgba(0,0,0,0.08);
-      text-align: center;
-    }
+.card{
+  background:white;
+  border-radius:22px;
+  padding:30px 25px;
+  box-shadow:0 10px 35px rgba(0,0,0,.08);
+  text-align:center;
+  margin-bottom:20px;
+}
 
-    h1 {
-      font-size: 27px;
-      margin: 0 0 10px;
-    }
+h1{
+  font-size:26px;
+  margin:0 0 8px;
+}
 
-    .sub {
-      color: #687386;
-      line-height: 1.6;
-      margin-bottom: 30px;
-    }
+h2{
+  font-size:21px;
+  margin:0 0 8px;
+}
 
-    input {
-      width: 100%;
-      padding: 18px;
-      font-size: 28px;
-      text-align: center;
-      letter-spacing: 10px;
-      border: 2px solid #dce2ea;
-      border-radius: 14px;
-      outline: none;
-      margin-bottom: 15px;
-    }
+.sub{
+  color:#687386;
+  line-height:1.6;
+  margin-bottom:25px;
+}
 
-    input:focus {
-      border-color: #17283d;
-    }
+.pin{
+  width:100%;
+  padding:18px;
+  font-size:28px;
+  text-align:center;
+  letter-spacing:10px;
+  border:2px solid #dce2ea;
+  border-radius:14px;
+  outline:none;
+  margin-bottom:15px;
+}
 
-    button {
-      width: 100%;
-      padding: 18px;
-      border: 0;
-      border-radius: 14px;
-      background: #17283d;
-      color: white;
-      font-size: 18px;
-      font-weight: 700;
-      cursor: pointer;
-    }
+.pin:focus{
+  border-color:#17283d;
+}
 
-    button:disabled {
-      opacity: 0.6;
-    }
+button{
+  width:100%;
+  padding:17px;
+  border:0;
+  border-radius:14px;
+  background:#17283d;
+  color:white;
+  font-size:17px;
+  font-weight:700;
+  cursor:pointer;
+}
 
-    #result {
-      margin-top: 20px;
-      font-size: 17px;
-      font-weight: 700;
-      line-height: 1.5;
-    }
+button:disabled{opacity:.6}
 
-    .notice {
-      margin-top: 25px;
-      font-size: 13px;
-      color: #8a94a3;
-      line-height: 1.6;
-    }
-  </style>
+.lookup-button{
+  background:#1769e0;
+}
+
+.result{
+  margin-top:18px;
+  font-size:16px;
+  font-weight:700;
+  line-height:1.6;
+}
+
+.notice{
+  margin-top:20px;
+  font-size:13px;
+  color:#8a94a3;
+  line-height:1.6;
+}
+
+/* 오늘 출석 결과 */
+
+.today-box{
+  margin-top:20px;
+  padding:22px 15px;
+  border-radius:16px;
+  background:#f5f7fb;
+}
+
+.today-name{
+  font-size:21px;
+  font-weight:800;
+  margin-bottom:12px;
+}
+
+.today-success{
+  font-size:20px;
+  font-weight:800;
+  color:#159447;
+}
+
+.today-none{
+  font-size:19px;
+  font-weight:800;
+  color:#e14a4a;
+}
+
+.today-time{
+  margin-top:7px;
+  color:#687386;
+  font-size:15px;
+}
+
+/* 최근 출석 */
+
+.history-title{
+  margin-top:28px;
+  margin-bottom:12px;
+  text-align:left;
+  font-size:17px;
+  font-weight:800;
+}
+
+.history{
+  border-top:1px solid #e7ebf0;
+}
+
+.history-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:15px 3px;
+  border-bottom:1px solid #e7ebf0;
+}
+
+.history-date{
+  font-weight:700;
+}
+
+.history-time{
+  color:#1769e0;
+  font-weight:700;
+}
+
+.empty{
+  padding:20px 0;
+  color:#8a94a3;
+}
+
+#attendanceArea{
+  display:none;
+}
+</style>
 </head>
 
 <body>
 
 <div class="wrap">
+
+  <!-- 제목 -->
   <div class="card">
 
     <h1>🥋 용인대 승리태권도</h1>
 
+    <div class="sub" style="margin-bottom:0">
+      학부모 출석 서비스
+    </div>
+
+  </div>
+
+
+  <!-- 출석 확인 -->
+  <div class="card">
+
+    <h2>✅ 우리 아이 출석 확인</h2>
+
     <div class="sub">
-      자녀의 출석 알림을<br>
-      휴대폰으로 받아보세요.
+      알림을 놓치셨더라도<br>
+      언제든 출석 여부를 확인할 수 있습니다.
+    </div>
+
+    <input
+      id="checkPin"
+      class="pin"
+      type="tel"
+      maxlength="4"
+      inputmode="numeric"
+      placeholder="0000"
+      onkeydown="if(event.key==='Enter') checkAttendance()"
+    >
+
+    <button
+      id="checkBtn"
+      class="lookup-button"
+      onclick="checkAttendance()">
+      출석 확인하기
+    </button>
+
+    <div id="checkResult" class="result"></div>
+
+    <div id="attendanceArea">
+
+      <div id="todayBox" class="today-box"></div>
+
+      <div class="history-title">
+        최근 출석 기록
+      </div>
+
+      <div id="history" class="history"></div>
+
+    </div>
+
+  </div>
+
+
+  <!-- 알림 등록 -->
+  <div class="card">
+
+    <h2>🔔 출석 알림 등록</h2>
+
+    <div class="sub">
+      자녀가 출석하면<br>
+      휴대폰으로 바로 알려드립니다.
     </div>
 
     <input
       id="pin"
+      class="pin"
       type="tel"
       maxlength="4"
       inputmode="numeric"
       placeholder="0000"
     >
 
-    <button id="registerBtn" onclick="registerPush()">
+    <button
+      id="registerBtn"
+      onclick="registerPush()">
       출석 알림 등록하기
     </button>
 
-    <div id="result"></div>
+    <div id="result" class="result"></div>
 
     <div class="notice">
       알림 등록은 최초 1회만 하시면 됩니다.<br>
@@ -122,106 +262,399 @@
     </div>
 
   </div>
+
 </div>
+
 
 <script>
 
 const SUPABASE_URL =
-  "https://ixuxlblfkoccmwqxsjbw.supabase.co";
+"https://ixuxlblfkoccmwqxsjbw.supabase.co";
 
 const SUPABASE_KEY =
-  "sb_publishable_lmwJJaHfZzE5hXnZnF49oA__F7JpDZ8";
+"sb_publishable_lmwJJaHfZzE5hXnZnF49oA__F7JpDZ8";
 
 const VAPID_PUBLIC_KEY =
-  "BOBiao0_8ypwHad3rAeVJ6m4q8A8Tt9gRTOqJEwyzJKgJ37nQ0k69fz-dQEcLcd6CQq3fu_6FSwb64o780EDqME";
+"BOBiao0_8ypwHad3rAeVJ6m4q8A8Tt9gRTOqJEwyzJKgJ37nQ0k69fz-dQEcLcd6CQq3fu_6FSwb64o780EDqME";
 
 
-function urlBase64ToUint8Array(base64String) {
-  const padding =
-    "=".repeat((4 - base64String.length % 4) % 4);
+/* =========================
+   날짜 관련
+========================= */
 
-  const base64 =
-    (base64String + padding)
-      .replace(/-/g, "+")
-      .replace(/_/g, "/");
+function koreaDateString(){
 
-  const rawData = window.atob(base64);
+  const parts =
+    new Intl.DateTimeFormat(
+      "en-CA",
+      {
+        timeZone:"Asia/Seoul",
+        year:"numeric",
+        month:"2-digit",
+        day:"2-digit"
+      }
+    ).formatToParts(new Date());
 
-  return Uint8Array.from(
-    [...rawData].map(char => char.charCodeAt(0))
+  const values={};
+
+  parts.forEach(p=>{
+    values[p.type]=p.value;
+  });
+
+  return (
+    values.year+"-"+
+    values.month+"-"+
+    values.day
   );
 }
 
 
-async function registerPush() {
+function formatDate(dateString){
 
-  const pin =
-    document.getElementById("pin").value.trim();
+  const p=dateString.split("-");
 
-  const result =
-    document.getElementById("result");
+  if(p.length!==3)
+    return dateString;
 
-  const button =
-    document.getElementById("registerBtn");
+  return (
+    Number(p[1])+"월 "+
+    Number(p[2])+"일"
+  );
+}
 
 
-  if (!/^\d{4}$/.test(pin)) {
-    result.textContent =
+function formatTime(value){
+
+  if(!value)return "";
+
+  const date=new Date(value);
+
+  return date.toLocaleTimeString(
+    "ko-KR",
+    {
+      timeZone:"Asia/Seoul",
+      hour:"2-digit",
+      minute:"2-digit"
+    }
+  );
+}
+
+
+/* =========================
+   출석 확인
+========================= */
+
+async function checkAttendance(){
+
+  const pin=
+    document.getElementById("checkPin")
+    .value.trim();
+
+  const result=
+    document.getElementById("checkResult");
+
+  const button=
+    document.getElementById("checkBtn");
+
+  const area=
+    document.getElementById("attendanceArea");
+
+
+  area.style.display="none";
+
+
+  if(!/^\d{4}$/.test(pin)){
+
+    result.textContent=
       "4자리 출석번호를 입력해주세요.";
+
     return;
   }
 
 
-  if (!("serviceWorker" in navigator)) {
-    result.textContent =
-      "이 브라우저에서는 알림 기능을 사용할 수 없습니다.";
-    return;
-  }
+  try{
+
+    button.disabled=true;
+
+    result.textContent=
+      "출석 기록을 확인하고 있습니다...";
 
 
-  if (!("PushManager" in window)) {
-    result.textContent =
-      "이 기기에서는 푸시 알림을 지원하지 않습니다.";
-    return;
-  }
+    const response=
+      await fetch(
+        SUPABASE_URL+
+        "/rest/v1/rpc/parent_attendance_history",
+        {
+          method:"POST",
+
+          headers:{
+            "Content-Type":"application/json",
+            "apikey":SUPABASE_KEY,
+            "Authorization":
+              "Bearer "+SUPABASE_KEY
+          },
+
+          body:JSON.stringify({
+            input_pin:pin
+          })
+        }
+      );
 
 
-  try {
-
-    button.disabled = true;
-    result.textContent =
-      "알림 등록 중입니다...";
+    const data=
+      await response.json();
 
 
-    const permission =
-      await Notification.requestPermission();
+    if(!data.success){
 
+      result.textContent=
+        data.message ||
+        "출석 기록을 확인할 수 없습니다.";
 
-    if (permission !== "granted") {
-      result.textContent =
-        "알림 권한을 허용해주세요.";
-
-      button.disabled = false;
       return;
     }
 
 
-    const registration =
-      await navigator.serviceWorker.register("/sw.js");
+    result.textContent="";
+
+    const records=
+      Array.isArray(data.records)
+      ? data.records
+      : [];
+
+
+    const today=
+      koreaDateString();
+
+
+    const todayRecord=
+      records.find(
+        r=>r.attendance_date===today
+      );
+
+
+    const todayBox=
+      document.getElementById("todayBox");
+
+
+    if(todayRecord){
+
+      todayBox.innerHTML=
+        '<div class="today-name">'+
+        escapeHtml(data.name)+
+        '</div>'+
+        '<div class="today-success">'+
+        '✅ 오늘 출석했습니다.'+
+        '</div>'+
+        '<div class="today-time">'+
+        '출석시간 '+formatTime(todayRecord.checked_at)+
+        '</div>';
+
+    }else{
+
+      todayBox.innerHTML=
+        '<div class="today-name">'+
+        escapeHtml(data.name)+
+        '</div>'+
+        '<div class="today-none">'+
+        '오늘 출석 기록이 없습니다.'+
+        '</div>';
+
+    }
+
+
+    const history=
+      document.getElementById("history");
+
+    history.innerHTML="";
+
+
+    if(records.length===0){
+
+      history.innerHTML=
+        '<div class="empty">'+
+        '아직 출석 기록이 없습니다.'+
+        '</div>';
+
+    }else{
+
+      records.forEach(r=>{
+
+        const row=
+          document.createElement("div");
+
+        row.className="history-row";
+
+
+        const date=
+          document.createElement("div");
+
+        date.className="history-date";
+
+        date.textContent=
+          formatDate(r.attendance_date);
+
+
+        const time=
+          document.createElement("div");
+
+        time.className="history-time";
+
+        time.textContent=
+          "출석 "+formatTime(r.checked_at);
+
+
+        row.appendChild(date);
+        row.appendChild(time);
+
+        history.appendChild(row);
+
+      });
+
+    }
+
+
+    area.style.display="block";
+
+
+  }catch(error){
+
+    console.error(error);
+
+    result.textContent=
+      "출석 확인 중 오류가 발생했습니다.";
+
+  }finally{
+
+    button.disabled=false;
+
+  }
+
+}
+
+
+/* =========================
+   HTML 안전처리
+========================= */
+
+function escapeHtml(value){
+
+  return String(value)
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+
+}
+
+
+/* =========================
+   기존 푸시 알림 등록
+========================= */
+
+function urlBase64ToUint8Array(base64String){
+
+  const padding=
+    "=".repeat(
+      (4-base64String.length%4)%4
+    );
+
+  const base64=
+    (base64String+padding)
+      .replace(/-/g,"+")
+      .replace(/_/g,"/");
+
+  const rawData=
+    window.atob(base64);
+
+  return Uint8Array.from(
+    [...rawData]
+      .map(char=>char.charCodeAt(0))
+  );
+}
+
+
+async function registerPush(){
+
+  const pin=
+    document.getElementById("pin")
+    .value.trim();
+
+  const result=
+    document.getElementById("result");
+
+  const button=
+    document.getElementById("registerBtn");
+
+
+  if(!/^\d{4}$/.test(pin)){
+
+    result.textContent=
+      "4자리 출석번호를 입력해주세요.";
+
+    return;
+  }
+
+
+  if(!("serviceWorker" in navigator)){
+
+    result.textContent=
+      "이 브라우저에서는 알림 기능을 사용할 수 없습니다.";
+
+    return;
+  }
+
+
+  if(!("PushManager" in window)){
+
+    result.textContent=
+      "이 기기에서는 푸시 알림을 지원하지 않습니다.";
+
+    return;
+  }
+
+
+  try{
+
+    button.disabled=true;
+
+    result.textContent=
+      "알림 등록 중입니다...";
+
+
+    const permission=
+      await Notification.requestPermission();
+
+
+    if(permission!=="granted"){
+
+      result.textContent=
+        "알림 권한을 허용해주세요.";
+
+      return;
+    }
+
+
+    const registration=
+      await navigator.serviceWorker
+      .register("/sw.js");
 
 
     await navigator.serviceWorker.ready;
 
 
-    let subscription =
-      await registration.pushManager.getSubscription();
+    let subscription=
+      await registration.pushManager
+      .getSubscription();
 
 
-    if (!subscription) {
+    if(!subscription){
 
-      subscription =
-        await registration.pushManager.subscribe({
-          userVisibleOnly: true,
+      subscription=
+        await registration.pushManager
+        .subscribe({
+          userVisibleOnly:true,
           applicationServerKey:
             urlBase64ToUint8Array(
               VAPID_PUBLIC_KEY
@@ -231,65 +664,67 @@ async function registerPush() {
     }
 
 
-    const json =
+    const json=
       subscription.toJSON();
 
 
-    const response =
+    const response=
       await fetch(
-        SUPABASE_URL +
+        SUPABASE_URL+
         "/rest/v1/rpc/register_parent_push",
         {
-          method: "POST",
+          method:"POST",
 
-          headers: {
-            "Content-Type": "application/json",
-            "apikey": SUPABASE_KEY,
+          headers:{
+            "Content-Type":"application/json",
+            "apikey":SUPABASE_KEY,
             "Authorization":
-              "Bearer " + SUPABASE_KEY
+              "Bearer "+SUPABASE_KEY
           },
 
-          body: JSON.stringify({
-            input_pin: pin,
-            input_endpoint: json.endpoint,
-            input_p256dh: json.keys.p256dh,
-            input_auth: json.keys.auth
+          body:JSON.stringify({
+            input_pin:pin,
+            input_endpoint:json.endpoint,
+            input_p256dh:json.keys.p256dh,
+            input_auth:json.keys.auth
           })
         }
       );
 
 
-    const data =
+    const data=
       await response.json();
 
 
-    if (data.success) {
+    if(data.success){
 
-      result.innerHTML =
-        "✅ " +
-        data.name +
+      result.innerHTML=
+        "✅ "+
+        escapeHtml(data.name)+
         " 수련생<br>출석 알림 등록 완료!";
 
-    } else {
+    }else{
 
-      result.textContent =
+      result.textContent=
         data.message ||
         "알림 등록에 실패했습니다.";
 
     }
 
 
-  } catch (error) {
+  }catch(error){
 
     console.error(error);
 
-    result.textContent =
+    result.textContent=
       "알림 등록 중 오류가 발생했습니다.";
+
+  }finally{
+
+    button.disabled=false;
 
   }
 
-
-  button.disabled = false;
 }
 
 </script>
