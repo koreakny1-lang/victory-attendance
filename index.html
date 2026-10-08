@@ -919,6 +919,10 @@ async function uploadPhoto(){
       "/functions/v1/upload-attendance-photo",
       {
         method:"POST",
+        headers:{
+          "apikey":SUPABASE_KEY,
+          "Authorization":"Bearer "+SUPABASE_KEY
+        },
         body:formData
       }
     );
