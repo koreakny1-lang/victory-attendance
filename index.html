@@ -620,35 +620,255 @@ function openCamera(){
 }
 
 
-function photoSelected(event){
 
-  const file=
-  event.target.files[0];
+ async function photoSelected(event){
+
+  const file =
+    event.target.files[0];
 
   if(!file)return;
 
-  selectedPhoto=file;
-
-  const preview=
-  document.getElementById("preview");
-
-  preview.src=
-  URL.createObjectURL(file);
-
-  preview.style.display="block";
-
-  document.getElementById(
-    "cameraBtn"
-  ).style.display="none";
-
-  document.getElementById(
-    "photoActions"
-  ).style.display="flex";
 
   document.getElementById(
     "photoMessage"
-  ).textContent=
-  "사진을 확인한 뒤 보내기를 눌러주세요.";
+  ).textContent =
+    "사진을 준비하고 있습니다...";
+
+
+  try{
+
+    /*
+     * 사진 불러오기
+     */
+
+    const imageUrl =
+      URL.createObjectURL(file);
+
+    const image =
+      new Image();
+
+
+    await new Promise(
+      (resolve,reject)=>{
+
+        image.onload =
+          resolve;
+
+        image.onerror =
+          reject;
+
+        image.src =
+          imageUrl;
+
+      }
+    );
+
+
+    /*
+     * 사진 크기 자동 축소
+     *
+     * 최대 1280px
+     */
+
+    const MAX_SIZE =
+      1280;
+
+
+    let width =
+      image.naturalWidth;
+
+    let height =
+      image.naturalHeight;
+
+
+    if(
+      width >
+      MAX_SIZE ||
+      height >
+      MAX_SIZE
+    ){
+
+      const ratio =
+        Math.min(
+          MAX_SIZE / width,
+          MAX_SIZE / height
+        );
+
+
+      width =
+        Math.round(
+          width * ratio
+        );
+
+
+      height =
+        Math.round(
+          height * ratio
+        );
+
+    }
+
+
+    /*
+     * Canvas로 사진 압축
+     */
+
+    const canvas =
+      document.createElement(
+        "canvas"
+      );
+
+
+    canvas.width =
+      width;
+
+    canvas.height =
+      height;
+
+
+    const ctx =
+      canvas.getContext(
+        "2d"
+      );
+
+
+    ctx.drawImage(
+      image,
+      0,
+      0,
+      width,
+      height
+    );
+
+
+    /*
+     * JPEG 82% 화질
+     */
+
+    const blob =
+      await new Promise(
+        resolve =>
+          canvas.toBlob(
+            resolve,
+            "image/jpeg",
+            0.82
+          )
+      );
+
+
+    URL.revokeObjectURL(
+      imageUrl
+    );
+
+
+    if(!blob){
+
+      throw new Error(
+        "사진 변환 실패"
+      );
+
+    }
+
+
+    /*
+     * 압축된 사진을
+     * 전송용 파일로 저장
+     */
+
+    selectedPhoto =
+      new File(
+        [blob],
+        "attendance.jpg",
+        {
+          type:
+            "image/jpeg"
+        }
+      );
+
+
+    /*
+     * 미리보기
+     */
+
+    const preview =
+      document.getElementById(
+        "preview"
+      );
+
+
+    if(preview.src){
+
+      try{
+
+        URL.revokeObjectURL(
+          preview.src
+        );
+
+      }catch(e){}
+
+    }
+
+
+    preview.src =
+      URL.createObjectURL(
+        selectedPhoto
+      );
+
+
+    preview.style.display =
+      "block";
+
+
+    document.getElementById(
+      "cameraBtn"
+    ).style.display =
+      "none";
+
+
+    document.getElementById(
+      "photoActions"
+    ).style.display =
+      "flex";
+
+
+    /*
+     * 실제 압축된 용량 표시
+     */
+
+    const sizeMB =
+      (
+        selectedPhoto.size /
+        1024 /
+        1024
+      ).toFixed(2);
+
+
+    document.getElementById(
+      "photoMessage"
+    ).textContent =
+      "사진 준비 완료 (" +
+      sizeMB +
+      "MB)";
+
+
+  }catch(error){
+
+    console.error(
+      error
+    );
+
+
+    selectedPhoto =
+      null;
+
+
+    document.getElementById(
+      "photoMessage"
+    ).textContent =
+      "사진을 처리하지 못했습니다. 다시 촬영해주세요.";
+
+  }
+
 }
 
 
