@@ -1,258 +1,371 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <meta name="theme-color" content="#062b5c">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#062b5c">
 
-  <title>용인대 승리태권도 출석체크</title>
+<title>용인대 승리태권도 출석체크</title>
 
-  <style>
-    * {
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 
-    body {
-      margin: 0;
-      font-family: Arial, "Noto Sans KR", sans-serif;
-      background: #f4f7fb;
-      color: #152238;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
+body{
+  margin:0;
+  font-family:Arial,"Noto Sans KR",sans-serif;
+  background:#f4f7fb;
+  color:#152238;
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
 
-    .wrap {
-      width: 100%;
-      max-width: 520px;
-      padding: 30px 24px;
-      text-align: center;
-    }
+.wrap{
+  width:100%;
+  max-width:520px;
+  padding:30px 24px;
+  text-align:center;
+}
 
-    .brand {
-      font-size: 17px;
-      font-weight: 700;
-      color: #315274;
-      margin-bottom: 8px;
-    }
+.brand{
+  font-size:17px;
+  font-weight:700;
+  color:#315274;
+  margin-bottom:8px;
+}
 
-    h1 {
-      margin: 0;
-      font-size: 34px;
-      color: #062b5c;
-      letter-spacing: -1px;
-    }
+h1{
+  margin:0;
+  font-size:34px;
+  color:#062b5c;
+  letter-spacing:-1px;
+}
 
-    .guide {
-      margin-top: 14px;
-      margin-bottom: 28px;
-      color: #6d7b8c;
-      font-size: 17px;
-    }
+.guide{
+  margin-top:14px;
+  margin-bottom:28px;
+  color:#6d7b8c;
+  font-size:17px;
+}
 
-    .pin-box {
-      display: flex;
-      justify-content: center;
-      gap: 14px;
-      margin-bottom: 28px;
-    }
+.pin-box{
+  display:flex;
+  justify-content:center;
+  gap:14px;
+  margin-bottom:28px;
+}
 
-    .dot {
-      width: 22px;
-      height: 22px;
-      border: 2px solid #b9c5d2;
-      border-radius: 50%;
-      background: white;
-    }
+.dot{
+  width:22px;
+  height:22px;
+  border:2px solid #b9c5d2;
+  border-radius:50%;
+  background:white;
+}
 
-    .dot.on {
-      background: #0b5bd3;
-      border-color: #0b5bd3;
-    }
+.dot.on{
+  background:#0b5bd3;
+  border-color:#0b5bd3;
+}
 
-    .keypad {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      max-width: 400px;
-      margin: 0 auto;
-    }
+.keypad{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+  max-width:400px;
+  margin:0 auto;
+}
 
-    button {
-      border: 0;
-      cursor: pointer;
-      touch-action: manipulation;
-    }
+button{
+  border:0;
+  cursor:pointer;
+  touch-action:manipulation;
+}
 
-    .key {
-      height: 82px;
-      border-radius: 18px;
-      background: white;
-      border: 1px solid #dce3ec;
-      font-size: 30px;
-      font-weight: 700;
-      color: #17283d;
-      box-shadow: 0 3px 10px rgba(0,0,0,.05);
-    }
+.key{
+  height:82px;
+  border-radius:18px;
+  background:white;
+  border:1px solid #dce3ec;
+  font-size:30px;
+  font-weight:700;
+  color:#17283d;
+  box-shadow:0 3px 10px rgba(0,0,0,.05);
+}
 
-    .key:active {
-      background: #e8eef7;
-      transform: scale(.97);
-    }
+.key:active{transform:scale(.97)}
 
-    .delete {
-      color: #63758a;
-      font-size: 24px;
-    }
+.delete{
+  color:#63758a;
+  font-size:24px;
+}
 
-    .confirm {
-      background: #0b5bd3;
-      color: white;
-      font-size: 20px;
-    }
+.confirm{
+  background:#0b5bd3;
+  color:white;
+  font-size:20px;
+}
 
-    .confirm:disabled {
-      opacity: .45;
-    }
+.confirm:disabled{opacity:.45}
 
-    .message {
-      min-height: 34px;
-      margin-top: 24px;
-      font-size: 18px;
-      font-weight: 700;
-    }
+.message{
+  min-height:34px;
+  margin-top:24px;
+  font-size:18px;
+  font-weight:700;
+}
 
-    .success {
-      color: #079447;
-    }
+.error{color:#e04444}
 
-    .error {
-      color: #e04444;
-    }
+.success-card{
+  display:none;
+  background:white;
+  border-radius:24px;
+  padding:30px 25px;
+  box-shadow:0 10px 35px rgba(0,0,0,.08);
+}
 
-    .success-card {
-      display: none;
-      background: white;
-      border-radius: 24px;
-      padding: 38px 25px;
-      box-shadow: 0 10px 35px rgba(0,0,0,.08);
-    }
+.check{
+  width:70px;
+  height:70px;
+  border-radius:50%;
+  background:#08a64d;
+  color:white;
+  margin:0 auto 15px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-size:40px;
+}
 
-    .check {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      background: #08a64d;
-      color: white;
-      margin: 0 auto 20px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 45px;
-    }
+.student-name{
+  font-size:30px;
+  font-weight:800;
+  color:#062b5c;
+}
 
-    .student-name {
-      font-size: 32px;
-      font-weight: 800;
-      color: #062b5c;
-    }
+.complete-text{
+  margin-top:8px;
+  font-size:22px;
+  color:#079447;
+  font-weight:800;
+}
 
-    .complete-text {
-      margin-top: 10px;
-      font-size: 24px;
-      color: #079447;
-      font-weight: 800;
-    }
+.time{
+  margin-top:10px;
+  color:#738093;
+  font-size:17px;
+}
 
-    .time {
-      margin-top: 14px;
-      color: #738093;
-      font-size: 18px;
-    }
+/* 사진 */
 
-    @media (max-width: 500px) {
-      .wrap {
-        padding: 20px;
-      }
+.photo-area{
+  margin-top:25px;
+  border-top:1px solid #e5e9ef;
+  padding-top:22px;
+}
 
-      .key {
-        height: 72px;
-      }
+.photo-guide{
+  color:#66768a;
+  margin-bottom:13px;
+  font-size:15px;
+}
 
-      h1 {
-        font-size: 29px;
-      }
-    }
-  </style>
+.photo-button{
+  width:100%;
+  min-height:58px;
+  border-radius:15px;
+  background:#17283d;
+  color:white;
+  font-size:18px;
+  font-weight:800;
+}
+
+.skip-button{
+  width:100%;
+  min-height:48px;
+  margin-top:8px;
+  background:transparent;
+  color:#788697;
+  font-size:15px;
+}
+
+#photoInput{
+  display:none;
+}
+
+.preview{
+  display:none;
+  width:100%;
+  max-height:330px;
+  object-fit:cover;
+  border-radius:15px;
+  margin-top:15px;
+}
+
+.photo-actions{
+  display:none;
+  gap:8px;
+  margin-top:10px;
+}
+
+.photo-actions button{
+  flex:1;
+  min-height:52px;
+  border-radius:13px;
+  font-size:16px;
+  font-weight:800;
+}
+
+.retake{
+  background:#e9edf3;
+  color:#24364a;
+}
+
+.upload{
+  background:#0b5bd3;
+  color:white;
+}
+
+.upload:disabled{opacity:.5}
+
+#photoMessage{
+  margin-top:12px;
+  font-weight:700;
+  line-height:1.5;
+}
+
+@media(max-width:500px){
+  .wrap{padding:20px}
+  .key{height:72px}
+  h1{font-size:29px}
+}
+</style>
 </head>
 
 <body>
 
 <div class="wrap">
 
-  <div id="checkScreen">
+<div id="checkScreen">
 
-    <div class="brand">용인대 승리태권도</div>
+<div class="brand">용인대 승리태권도</div>
+<h1>출석체크</h1>
 
-    <h1>출석체크</h1>
+<div class="guide">
+출석번호 4자리를 입력해주세요
+</div>
 
-    <div class="guide">
-      출석번호 4자리를 입력해주세요
-    </div>
+<div class="pin-box">
+<div class="dot"></div>
+<div class="dot"></div>
+<div class="dot"></div>
+<div class="dot"></div>
+</div>
 
-    <div class="pin-box">
-      <div class="dot"></div>
-      <div class="dot"></div>
-      <div class="dot"></div>
-      <div class="dot"></div>
-    </div>
+<div class="keypad">
 
-    <div class="keypad">
+<button class="key" onclick="press('1')">1</button>
+<button class="key" onclick="press('2')">2</button>
+<button class="key" onclick="press('3')">3</button>
 
-      <button class="key" onclick="press('1')">1</button>
-      <button class="key" onclick="press('2')">2</button>
-      <button class="key" onclick="press('3')">3</button>
+<button class="key" onclick="press('4')">4</button>
+<button class="key" onclick="press('5')">5</button>
+<button class="key" onclick="press('6')">6</button>
 
-      <button class="key" onclick="press('4')">4</button>
-      <button class="key" onclick="press('5')">5</button>
-      <button class="key" onclick="press('6')">6</button>
+<button class="key" onclick="press('7')">7</button>
+<button class="key" onclick="press('8')">8</button>
+<button class="key" onclick="press('9')">9</button>
 
-      <button class="key" onclick="press('7')">7</button>
-      <button class="key" onclick="press('8')">8</button>
-      <button class="key" onclick="press('9')">9</button>
+<button class="key delete" onclick="removeNumber()">←</button>
+<button class="key" onclick="press('0')">0</button>
 
-      <button class="key delete" onclick="removeNumber()">←</button>
-      <button class="key" onclick="press('0')">0</button>
+<button
+id="confirmBtn"
+class="key confirm"
+onclick="checkAttendance()">
+확인
+</button>
 
-      <button
-        id="confirmBtn"
-        class="key confirm"
-        onclick="checkAttendance()">
-        확인
-      </button>
+</div>
 
-    </div>
+<div id="message" class="message"></div>
 
-    <div id="message" class="message"></div>
-
-  </div>
+</div>
 
 
-  <div id="successScreen" class="success-card">
+<!-- 출석 완료 -->
 
-    <div class="check">✓</div>
+<div id="successScreen" class="success-card">
 
-    <div id="studentName" class="student-name"></div>
+<div class="check">✓</div>
 
-    <div class="complete-text">
-      출석 완료!
-    </div>
+<div id="studentName" class="student-name"></div>
 
-    <div id="checkTime" class="time"></div>
+<div class="complete-text">
+출석 완료!
+</div>
 
-  </div>
+<div id="checkTime" class="time"></div>
+
+
+<div class="photo-area">
+
+<div class="photo-guide">
+출석사진을 촬영할 수 있습니다.
+</div>
+
+<button
+id="cameraBtn"
+class="photo-button"
+onclick="openCamera()">
+📷 출석사진 찍기
+</button>
+
+<input
+id="photoInput"
+type="file"
+accept="image/*"
+capture="environment"
+onchange="photoSelected(event)"
+>
+
+<img
+id="preview"
+class="preview"
+alt="출석사진 미리보기"
+>
+
+<div id="photoActions" class="photo-actions">
+
+<button
+class="retake"
+onclick="openCamera()">
+다시 찍기
+</button>
+
+<button
+id="uploadBtn"
+class="upload"
+onclick="uploadPhoto()">
+사진 보내기
+</button>
+
+</div>
+
+<div id="photoMessage"></div>
+
+<button
+id="skipBtn"
+class="skip-button"
+onclick="finishAndReset()">
+사진 없이 완료
+</button>
+
+</div>
+
+</div>
 
 </div>
 
@@ -260,54 +373,56 @@
 <script>
 
 const SUPABASE_URL =
-  "https://ixuxlblfkoccmwqxsjbw.supabase.co";
+"https://ixuxlblfkoccmwqxsjbw.supabase.co";
 
 const SUPABASE_KEY =
-  "sb_publishable_lmwJJaHfZzE5hXnZnF49oA__F7JpDZ8";
+"sb_publishable_lmwJJaHfZzE5hXnZnF49oA__F7JpDZ8";
+
+let pin="";
+let processing=false;
+
+let attendancePin="";
+let selectedPhoto=null;
 
 
-let pin = "";
-let processing = false;
+/* 숫자 입력 */
 
+function press(number){
 
-function press(number) {
+  if(processing)return;
+  if(pin.length>=4)return;
 
-  if (processing) return;
-
-  if (pin.length >= 4) return;
-
-  pin += number;
-
+  pin+=number;
   updateDots();
 
-  if (pin.length === 4) {
-    document.getElementById("message").textContent =
-      "확인을 눌러주세요.";
+  if(pin.length===4){
+    document.getElementById("message").textContent=
+    "확인을 눌러주세요.";
   }
 }
 
 
-function removeNumber() {
+function removeNumber(){
 
-  if (processing) return;
+  if(processing)return;
 
-  pin = pin.slice(0, -1);
-
+  pin=pin.slice(0,-1);
   updateDots();
 
-  document.getElementById("message").textContent = "";
+  document.getElementById("message").textContent="";
 }
 
 
-function updateDots() {
+function updateDots(){
 
-  const dots = document.querySelectorAll(".dot");
+  const dots=
+  document.querySelectorAll(".dot");
 
-  dots.forEach((dot, index) => {
+  dots.forEach((dot,index)=>{
 
-    if (index < pin.length) {
+    if(index<pin.length){
       dot.classList.add("on");
-    } else {
+    }else{
       dot.classList.remove("on");
     }
 
@@ -315,33 +430,35 @@ function updateDots() {
 }
 
 
-async function sendParentPush(attendancePin) {
+/* 부모님 푸시 */
 
-  try {
+async function sendParentPush(attendancePin){
 
-    const response = await fetch(
-      SUPABASE_URL + "/functions/v1/send-push",
+  try{
+
+    const response=
+    await fetch(
+      SUPABASE_URL+"/functions/v1/send-push",
       {
-        method: "POST",
-
-        headers: {
-          "Content-Type": "application/json"
+        method:"POST",
+        headers:{
+          "Content-Type":"application/json"
         },
-
-        body: JSON.stringify({
-          pin: attendancePin
+        body:JSON.stringify({
+          pin:attendancePin
         })
       }
     );
 
+    const data=
+    await response.json();
 
-    const data = await response.json();
+    console.log(
+      "부모님 푸시 알림 결과:",
+      data
+    );
 
-    console.log("부모님 푸시 알림 결과:", data);
-
-  }
-
-  catch (error) {
+  }catch(error){
 
     console.error(
       "부모님 푸시 알림 오류:",
@@ -349,229 +466,353 @@ async function sendParentPush(attendancePin) {
     );
 
   }
-
 }
 
 
-async function checkAttendance() {
+/* 출석 */
 
-  if (processing) return;
+async function checkAttendance(){
 
-  const message =
-    document.getElementById("message");
+  if(processing)return;
 
+  const message=
+  document.getElementById("message");
 
-  if (pin.length !== 4) {
+  if(pin.length!==4){
 
-    message.className =
-      "message error";
-
-    message.textContent =
-      "출석번호 4자리를 입력해주세요.";
+    message.className="message error";
+    message.textContent=
+    "출석번호 4자리를 입력해주세요.";
 
     return;
   }
 
-
-  processing = true;
+  processing=true;
 
   document.getElementById(
     "confirmBtn"
-  ).disabled = true;
+  ).disabled=true;
 
-  message.className =
-    "message";
+  message.className="message";
+  message.textContent="확인 중...";
 
-  message.textContent =
-    "확인 중...";
+  try{
 
+    attendancePin=pin;
 
-  try {
-
-    const attendancePin = pin;
-
-
-    const response = await fetch(
-      SUPABASE_URL +
+    const response=
+    await fetch(
+      SUPABASE_URL+
       "/rest/v1/rpc/check_attendance",
       {
-        method: "POST",
+        method:"POST",
 
-        headers: {
-          "Content-Type":
-            "application/json",
-
-          "apikey":
-            SUPABASE_KEY,
-
+        headers:{
+          "Content-Type":"application/json",
+          "apikey":SUPABASE_KEY,
           "Authorization":
-            "Bearer " + SUPABASE_KEY
+          "Bearer "+SUPABASE_KEY
         },
 
-        body: JSON.stringify({
-          input_pin: attendancePin
+        body:JSON.stringify({
+          input_pin:attendancePin
         })
       }
     );
 
-
-    if (!response.ok) {
-      throw new Error(
-        "출석 서버 오류"
-      );
+    if(!response.ok){
+      throw new Error("출석 서버 오류");
     }
 
+    const result=
+    await response.json();
 
-    const result =
-      await response.json();
-
-
-    if (result.success) {
-
-      /*
-       * 출석 저장이 성공한 경우에만
-       * 부모님 휴대폰으로 알림을 전송합니다.
-       */
+    if(result.success){
 
       sendParentPush(attendancePin);
 
+      showSuccess(result.name);
 
-      /*
-       * 기존 출석 완료 화면
-       */
+    }else{
 
-      showSuccess(
-        result.name
+      message.className="message error";
+
+      if(result.already){
+
+        message.textContent=
+        result.name+
+        " 수련생은 이미 출석했습니다.";
+
+      }else{
+
+        message.textContent=
+        result.message||
+        "출석번호를 확인해주세요.";
+
+      }
+
+      resetPin();
+    }
+
+  }catch(error){
+
+    console.error(error);
+
+    message.className="message error";
+
+    message.textContent=
+    "연결에 문제가 있습니다. 다시 시도해주세요.";
+
+    resetPin();
+
+  }finally{
+
+    processing=false;
+
+    document.getElementById(
+      "confirmBtn"
+    ).disabled=false;
+
+  }
+}
+
+
+/* 출석 성공 */
+
+function showSuccess(name){
+
+  document.getElementById(
+    "checkScreen"
+  ).style.display="none";
+
+  document.getElementById(
+    "successScreen"
+  ).style.display="block";
+
+  document.getElementById(
+    "studentName"
+  ).textContent=
+  name+" 수련생";
+
+  document.getElementById(
+    "checkTime"
+  ).textContent=
+  new Date().toLocaleTimeString(
+    "ko-KR",
+    {
+      hour:"2-digit",
+      minute:"2-digit"
+    }
+  );
+
+  clearPhoto();
+}
+
+
+/* 카메라 */
+
+function openCamera(){
+
+  document.getElementById(
+    "photoInput"
+  ).click();
+
+}
+
+
+function photoSelected(event){
+
+  const file=
+  event.target.files[0];
+
+  if(!file)return;
+
+  selectedPhoto=file;
+
+  const preview=
+  document.getElementById("preview");
+
+  preview.src=
+  URL.createObjectURL(file);
+
+  preview.style.display="block";
+
+  document.getElementById(
+    "cameraBtn"
+  ).style.display="none";
+
+  document.getElementById(
+    "photoActions"
+  ).style.display="flex";
+
+  document.getElementById(
+    "photoMessage"
+  ).textContent=
+  "사진을 확인한 뒤 보내기를 눌러주세요.";
+}
+
+
+/* 사진 업로드 */
+
+async function uploadPhoto(){
+
+  if(!selectedPhoto){
+
+    document.getElementById(
+      "photoMessage"
+    ).textContent=
+    "사진을 먼저 찍어주세요.";
+
+    return;
+  }
+
+  const button=
+  document.getElementById("uploadBtn");
+
+  button.disabled=true;
+
+  document.getElementById(
+    "photoMessage"
+  ).textContent=
+  "사진을 보내고 있습니다...";
+
+  try{
+
+    const formData=
+    new FormData();
+
+    formData.append(
+      "pin",
+      attendancePin
+    );
+
+    formData.append(
+      "photo",
+      selectedPhoto,
+      selectedPhoto.name||"attendance.jpg"
+    );
+
+    const response=
+    await fetch(
+      SUPABASE_URL+
+      "/functions/v1/upload-attendance-photo",
+      {
+        method:"POST",
+        body:formData
+      }
+    );
+
+    const data=
+    await response.json();
+
+    if(!response.ok || !data.success){
+
+      throw new Error(
+        data.message||
+        "사진 저장 실패"
       );
 
     }
 
-    else {
+    document.getElementById(
+      "photoMessage"
+    ).textContent=
+    "✅ 출석사진을 보냈습니다.";
 
-      message.className =
-        "message error";
+    document.getElementById(
+      "photoActions"
+    ).style.display="none";
 
+    document.getElementById(
+      "skipBtn"
+    ).textContent=
+    "완료";
 
-      if (result.already) {
+    setTimeout(
+      finishAndReset,
+      1500
+    );
 
-        message.textContent =
-          result.name +
-          " 수련생은 이미 출석했습니다.";
-
-      }
-
-      else {
-
-        message.textContent =
-          result.message ||
-          "출석번호를 확인해주세요.";
-
-      }
-
-
-      resetPin();
-
-    }
-
-  }
-
-  catch (error) {
+  }catch(error){
 
     console.error(error);
 
-    message.className =
-      "message error";
-
-    message.textContent =
-      "연결에 문제가 있습니다. 다시 시도해주세요.";
-
-    resetPin();
-
-  }
-
-  finally {
-
-    processing = false;
-
     document.getElementById(
-      "confirmBtn"
-    ).disabled = false;
+      "photoMessage"
+    ).textContent=
+    "사진 전송에 실패했습니다. 다시 시도해주세요.";
 
+    button.disabled=false;
   }
-
 }
 
 
-function showSuccess(name) {
+/* 초기화 */
+
+function clearPhoto(){
+
+  selectedPhoto=null;
+
+  const input=
+  document.getElementById("photoInput");
+
+  input.value="";
+
+  const preview=
+  document.getElementById("preview");
+
+  if(preview.src){
+    URL.revokeObjectURL(
+      preview.src
+    );
+  }
+
+  preview.removeAttribute("src");
+  preview.style.display="none";
 
   document.getElementById(
-    "checkScreen"
-  ).style.display =
-    "none";
+    "cameraBtn"
+  ).style.display="block";
 
+  document.getElementById(
+    "photoActions"
+  ).style.display="none";
+
+  document.getElementById(
+    "photoMessage"
+  ).textContent="";
+
+  document.getElementById(
+    "skipBtn"
+  ).textContent="사진 없이 완료";
+}
+
+
+function finishAndReset(){
+
+  clearPhoto();
+
+  attendancePin="";
 
   document.getElementById(
     "successScreen"
-  ).style.display =
-    "block";
-
+  ).style.display="none";
 
   document.getElementById(
-    "studentName"
-  ).textContent =
-    name + " 수련생";
-
-
-  const now =
-    new Date();
-
+    "checkScreen"
+  ).style.display="block";
 
   document.getElementById(
-    "checkTime"
-  ).textContent =
-    now.toLocaleTimeString(
-      "ko-KR",
-      {
-        hour:
-          "2-digit",
+    "message"
+  ).textContent="";
 
-        minute:
-          "2-digit"
-      }
-    );
-
-
-  setTimeout(() => {
-
-    document.getElementById(
-      "successScreen"
-    ).style.display =
-      "none";
-
-
-    document.getElementById(
-      "checkScreen"
-    ).style.display =
-      "block";
-
-
-    document.getElementById(
-      "message"
-    ).textContent =
-      "";
-
-
-    resetPin();
-
-  }, 3000);
-
+  resetPin();
 }
 
 
-function resetPin() {
+function resetPin(){
 
-  pin = "";
-
+  pin="";
   updateDots();
 
 }
