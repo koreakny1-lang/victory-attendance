@@ -583,7 +583,7 @@ message.className="message error";
 if(error instanceof TypeError){
 message.textContent="인터넷 연결을 확인해주세요.";
 }else{
-message.textContent="관리자 비밀번호가 틀렸습니다.";
+message.textContent="관리자 조회 오류가 발생했습니다. Supabase 설정을 확인해주세요.";
 }
 
 }finally{
@@ -646,7 +646,7 @@ try{
 const results=await Promise.all([
 rpc("admin_students",{admin_password:adminPassword}),
 rpc("admin_today_attendance",{admin_password:adminPassword}),
-rpc("admin_today_departures",{admin_password:adminPassword})
+rpc("admin_today_departures",{admin_password:adminPassword}).catch(error=>{console.warn("귀가 시간 조회 실패:",error);return [];})
 ]);
 
 students=Array.isArray(results[0])?results[0]:[];
@@ -683,7 +683,7 @@ function mergeDepartures(departures){
 async function loadTodayAttendance(){
   const results=await Promise.all([
     rpc("admin_today_attendance",{admin_password:adminPassword}),
-    rpc("admin_today_departures",{admin_password:adminPassword})
+    rpc("admin_today_departures",{admin_password:adminPassword}).catch(error=>{console.warn("귀가 시간 조회 실패:",error);return [];})
   ]);
   todayAttendance=Array.isArray(results[0])?results[0]:[];
   mergeDepartures(results[1]);
