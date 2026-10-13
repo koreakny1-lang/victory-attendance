@@ -237,6 +237,9 @@ button{
 }
 
 
+.last-photo{display:none;max-width:230px;margin:0 auto 16px;padding:9px;background:#fff;border-radius:16px;box-shadow:0 4px 15px rgba(0,0,0,.1)}
+.last-photo img{width:100%;height:155px;object-fit:cover;border-radius:10px}
+.last-photo-caption{font-size:13px;color:#506178;margin-top:6px;font-weight:700}
 .camera-modal{display:none;position:fixed;inset:0;z-index:9999;background:#000;flex-direction:column}
 .camera-video-wrap{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#000}
 #cameraVideo{width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
@@ -265,6 +268,10 @@ button{
 
 <div class="guide">
 출석번호 4자리를 입력해주세요
+</div>
+<div id="lastPhotoBox" class="last-photo" aria-live="polite">
+  <img id="lastPhotoImage" alt="방금 촬영한 출석사진">
+  <div id="lastPhotoCaption" class="last-photo-caption">방금 촬영한 사진</div>
 </div>
 
 <div class="pin-box">
@@ -410,6 +417,28 @@ let selectedPhoto=null;
 let cameraStream=null;
 let currentFacingMode="user";
 let photoUploading=false;
+let lastPhotoUrl=null;
+let lastPhotoHideTimer=null;
+let currentStudentName="";
+
+function rememberLastPhoto(file){
+  if(!file)return;
+  if(lastPhotoHideTimer)clearTimeout(lastPhotoHideTimer);
+  if(lastPhotoUrl)URL.revokeObjectURL(lastPhotoUrl);
+  lastPhotoUrl=URL.createObjectURL(file);
+  document.getElementById("lastPhotoImage").src=lastPhotoUrl;
+  document.getElementById("lastPhotoCaption").textContent=
+    (currentStudentName ? currentStudentName+" · " : "")+"방금 촬영한 사진";
+  document.getElementById("lastPhotoBox").style.display="block";
+  lastPhotoHideTimer=setTimeout(hideLastPhoto,30000);
+}
+function hideLastPhoto(){
+  document.getElementById("lastPhotoBox").style.display="none";
+  document.getElementById("lastPhotoImage").removeAttribute("src");
+  if(lastPhotoUrl){URL.revokeObjectURL(lastPhotoUrl);lastPhotoUrl=null;}
+  lastPhotoHideTimer=null;
+}
+
 let countdownTimer=null;
 let countdownToken=0;
 
@@ -609,6 +638,7 @@ async function checkAttendance(){
 /* 출석 성공 */
 
 function showSuccess(name){
+  currentStudentName=name;
 
   document.getElementById(
     "checkScreen"
@@ -1216,6 +1246,7 @@ async function uploadPhoto(){
 
     photoMessage.textContent=
       "✅ 출석사진을 보냈습니다.";
+    rememberLastPhoto(selectedPhoto);
 
     document.getElementById(
       "photoActions"
