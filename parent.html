@@ -18,14 +18,22 @@ function render(){const box=$('months');box.replaceChildren();const prev=documen
 (()=>{
  const card=document.getElementById('installCard'),btn=document.getElementById('installApp'),help=document.getElementById('installHelp');
  const standalone=window.matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
- if(standalone){card.hidden=true;return;}
+ const seenKey='victory_parent_install_notice_seen_v1';
+ let seen=false;try{seen=localStorage.getItem(seenKey)==='1'}catch(_){}
+ if(standalone||seen){card.hidden=true;return;}
+ const dismiss=document.createElement('button');dismiss.type='button';dismiss.textContent='다음부터 보지 않기';
+ dismiss.style.cssText='display:block;margin:12px auto 0;border:0;background:transparent;color:#526c8d;text-decoration:underline;font-size:13px;cursor:pointer;padding:8px';
+ card.appendChild(dismiss);
+ const hideForever=()=>{try{localStorage.setItem(seenKey,'1')}catch(_){}card.hidden=true;};
+ dismiss.addEventListener('click',hideForever);
  let pending=null;
  window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();pending=e;btn.textContent='📲 앱 설치하기';});
- window.addEventListener('appinstalled',()=>{card.hidden=true;pending=null;});
+ window.addEventListener('appinstalled',()=>{hideForever();pending=null;});
  btn.addEventListener('click',async()=>{
-   if(pending){const e=pending;pending=null;await e.prompt();try{await e.userChoice}catch(_){}return;}
+   if(pending){const e=pending;pending=null;await e.prompt();try{const choice=await e.userChoice;if(choice?.outcome==='accepted')hideForever();}catch(_){}return;}
    const ua=navigator.userAgent,ios=/iPad|iPhone|iPod/.test(ua),samsung=/SamsungBrowser/i.test(ua),inapp=/KAKAOTALK|NAVER|Instagram|FBAN|FBAV|Line\//i.test(ua);
    help.hidden=false;
+   try{localStorage.setItem(seenKey,'1')}catch(_){}
    if(ios)help.textContent='아이폰: Safari에서 이 페이지를 여신 다음, 아래 공유 버튼(□↑) → 홈 화면에 추가 → 추가를 눌러주세요.';
    else if(inapp)help.textContent='현재 앱 안의 브라우저에서는 설치가 제한될 수 있습니다. 오른쪽 위 메뉴에서 Chrome 또는 기본 브라우저로 열고, 메뉴(⋮) → 홈 화면에 추가를 선택해 주세요.';
    else if(samsung)help.textContent='삼성 인터넷: 아래쪽 메뉴(≡) → 현재 페이지 추가 → 홈 화면을 선택해 주세요.';
