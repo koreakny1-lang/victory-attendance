@@ -3,14 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
 <title>용인대 승리태권도 관리자</title>
 
 <style>
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial,"Noto Sans KR",sans-serif;background:#f4f7fb;color:#17283d}
-header{background:#062b5c;color:white;padding:18px}
-header .inner{max-width:1100px;margin:auto;display:flex;justify-content:space-between;align-items:center}
+body{margin:0;font-family:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",Arial,sans-serif;background:#f4f7fb;color:#17283d}
+header{background:#062b5c;color:white;padding:18px;position:sticky;top:0;z-index:50}
+header .inner{max-width:1100px;margin:auto;display:flex;justify-content:space-between;align-items:center;gap:10px}
 header h1{margin:0;font-size:22px}
+header .today{font-size:13px;opacity:.8;margin-top:3px}
 header button{background:white;color:#062b5c;border:0;padding:9px 15px;border-radius:9px;font-weight:700;cursor:pointer}
 
 .container{max-width:1100px;margin:25px auto;padding:0 20px}
@@ -20,17 +22,20 @@ h2{margin:0 0 18px;color:#062b5c}
 .login{max-width:420px;margin:100px auto}
 
 input,select{
-width:100%;padding:12px;border:1px solid #d5dde7;border-radius:9px;font-size:15px;background:white
+width:100%;padding:12px;border:1px solid #d5dde7;border-radius:9px;font-size:15px;background:white;font-family:inherit
 }
 
 .form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:13px}
 .field label{display:block;font-size:13px;font-weight:700;margin-bottom:6px}
 .full{grid-column:1/-1}
 
+button{font-family:inherit}
+
 .primary{
 width:100%;border:0;border-radius:10px;background:#0b5bd3;color:white;
 padding:13px;font-size:16px;font-weight:700;cursor:pointer
 }
+.primary:disabled{opacity:.5}
 
 .dashboard{
 display:grid;
@@ -49,15 +54,22 @@ box-shadow:0 5px 20px rgba(0,0,0,.06);text-align:center
 .stat-number.blue{color:#0b5bd3}
 .stat-number.red{color:#df3e3e}
 
-.attendance-head,.birthday-head{
+.attendance-head,.birthday-head,.list-head{
 display:flex;justify-content:space-between;align-items:center;
-gap:10px;margin-bottom:15px
+gap:10px;margin-bottom:15px;flex-wrap:wrap
 }
 
-.refresh,.birthday-button{
+.refresh,.birthday-button,.small-btn{
 border:0;background:#edf3ff;color:#0b5bd3;
-padding:9px 13px;border-radius:9px;font-weight:700;cursor:pointer
+padding:9px 13px;border-radius:9px;font-weight:700;cursor:pointer;white-space:nowrap
 }
+
+.updated{font-size:12px;color:#97a3b3;margin-left:6px}
+
+/* 출석 / 미출석 탭 */
+.tabs{display:flex;gap:8px;margin-bottom:12px}
+.tab{border:0;background:#eef2f7;color:#5b6b80;padding:10px 16px;border-radius:10px;font-weight:800;cursor:pointer}
+.tab.on{background:#062b5c;color:#fff}
 
 .attendance-item{
 display:flex;justify-content:space-between;align-items:center;
@@ -65,6 +77,8 @@ padding:14px 4px;border-bottom:1px solid #edf0f4;gap:15px
 }
 
 .attendance-item:last-child{border-bottom:0}
+.att-left{display:flex;align-items:center;gap:12px;min-width:0}
+.att-photo{width:52px;height:52px;border-radius:12px;object-fit:cover;cursor:pointer;flex:0 0 52px;background:#eef2f7}
 .att-name{font-weight:800;color:#062b5c;font-size:17px}
 .att-detail{font-size:13px;color:#758195;margin-top:5px}
 .att-right{display:flex;align-items:center;gap:10px}
@@ -72,7 +86,12 @@ padding:14px 4px;border-bottom:1px solid #edf0f4;gap:15px
 
 .att-delete{
 border:0;background:#ffecec;color:#d63232;
-padding:8px 11px;border-radius:8px;font-weight:700;cursor:pointer
+padding:8px 11px;border-radius:8px;font-weight:700;cursor:pointer;white-space:nowrap
+}
+
+.att-check{
+border:0;background:#e6f6ec;color:#07803e;
+padding:8px 11px;border-radius:8px;font-weight:800;cursor:pointer;white-space:nowrap
 }
 
 .birthday-list{display:grid;gap:9px}
@@ -85,18 +104,23 @@ padding:13px 15px;border:1px solid #e8edf4;border-radius:11px
 .birthday-name{font-weight:800;color:#062b5c}
 .birthday-date{font-weight:700;color:#e55476}
 
-.search{margin-bottom:16px}
+.filters{display:grid;grid-template-columns:1fr 160px;gap:10px;margin-bottom:16px}
 
 .student{
 border:1px solid #e1e6ed;border-radius:13px;padding:15px;margin-bottom:10px;
 display:flex;align-items:center;justify-content:space-between;gap:15px
 }
+.student.off{background:#fafbfc;opacity:.75}
 
 .student-info{flex:1}
 
 .student-name{
-font-size:17px;font-weight:800;color:#062b5c;margin-bottom:7px
+font-size:17px;font-weight:800;color:#062b5c;margin-bottom:7px;display:flex;align-items:center;gap:8px
 }
+
+.badge{font-size:12px;font-weight:800;padding:3px 9px;border-radius:20px;background:#e6f6ec;color:#07803e}
+.badge.휴원{background:#fff4e5;color:#b45f06}
+.badge.퇴원{background:#eef0f3;color:#7a8696}
 
 .student-main{
 display:grid;
@@ -106,6 +130,7 @@ font-size:14px;color:#59687a
 }
 
 .student-main strong{color:#26384d}
+.student-sub{font-size:13px;color:#8090a3;margin-top:7px}
 
 .buttons{display:flex;gap:7px}
 
@@ -147,10 +172,17 @@ padding:12px 0 7px;border-bottom:2px solid #edf1f6;
 margin-bottom:5px
 }
 
+.photo-view{max-width:100%;max-height:75vh;border-radius:14px;display:block;margin:0 auto}
+
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#17283d;color:#fff;padding:12px 18px;border-radius:12px;font-weight:700;display:none;z-index:200;max-width:90vw}
+
 @media(max-width:650px){
 .form-grid{grid-template-columns:1fr}
 .full{grid-column:auto}
-.dashboard{grid-template-columns:1fr}
+.dashboard{grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{padding:14px 6px}
+.stat-number{font-size:26px}
+.stat-title{font-size:12px}
 .student{display:block}
 .buttons{margin-top:12px}
 header h1{font-size:17px}
@@ -158,6 +190,7 @@ header h1{font-size:17px}
 .attendance-item{align-items:flex-start}
 .att-right{flex-direction:column;align-items:flex-end}
 .birthday-head{align-items:flex-start}
+.filters{grid-template-columns:1fr}
 }
 </style>
 </head>
@@ -176,7 +209,7 @@ onkeydown="if(event.key==='Enter') login()">
 
 <br><br>
 
-<button class="primary" onclick="login()">로그인</button>
+<button class="primary" id="loginBtn" onclick="login()">로그인</button>
 <div id="loginMessage" class="message"></div>
 
 </div>
@@ -187,7 +220,10 @@ onkeydown="if(event.key==='Enter') login()">
 
 <header>
 <div class="inner">
+<div>
 <h1>용인대 승리태권도 출석관리</h1>
+<div id="todayLabel" class="today"></div>
+</div>
 <button onclick="logout()">로그아웃</button>
 </div>
 </header>
@@ -197,7 +233,7 @@ onkeydown="if(event.key==='Enter') login()">
 <div class="dashboard">
 
 <div class="stat">
-<div class="stat-title">전체 재원생</div>
+<div class="stat-title">재원생</div>
 <div id="totalStudents" class="stat-number">0</div>
 </div>
 
@@ -219,10 +255,19 @@ onkeydown="if(event.key==='Enter') login()">
 
 <div class="attendance-head">
 <h2 style="margin:0">오늘 출석현황</h2>
+<div>
+<span id="updatedAt" class="updated"></span>
 <button class="refresh" onclick="loadAll()">새로고침</button>
+</div>
+</div>
+
+<div class="tabs">
+<button class="tab on" id="tabPresent" onclick="setAttTab('present')">출석</button>
+<button class="tab" id="tabAbsent" onclick="setAttTab('absent')">미출석</button>
 </div>
 
 <div id="todayAttendance"></div>
+<div id="absentList" style="display:none"></div>
 
 </div>
 
@@ -275,7 +320,7 @@ onkeydown="if(event.key==='Enter') login()">
 
 <div class="field">
 <label>수련반</label>
-<input id="className" placeholder="예: 3부">
+<input id="className" placeholder="예: 3부" list="classList">
 </div>
 
 <div class="field">
@@ -294,10 +339,12 @@ onkeydown="if(event.key==='Enter') login()">
 </div>
 
 <div class="field full">
-<button class="primary" onclick="addStudent()">수련생 등록</button>
+<button class="primary" id="addBtn" onclick="addStudent()">수련생 등록</button>
 </div>
 
 </div>
+
+<datalist id="classList"></datalist>
 
 <div id="addMessage" class="message"></div>
 
@@ -307,11 +354,22 @@ onkeydown="if(event.key==='Enter') login()">
 <!-- 수련생 관리 -->
 <div class="card">
 
-<h2>수련생 관리</h2>
+<div class="list-head">
+<h2 style="margin:0">수련생 관리</h2>
+<button class="small-btn" onclick="exportStudents()">명단 엑셀(CSV) 받기</button>
+</div>
 
-<input id="search" class="search"
-placeholder="이름 · 출석번호 · 학부모 연락처 · 생년월일 검색"
+<div class="filters">
+<input id="search"
+placeholder="이름 · 출석번호 · 연락처 · 수련반 · 학교 · 띠 검색"
 oninput="renderStudents()">
+<select id="statusFilter" onchange="renderStudents()">
+<option value="">전체 상태</option>
+<option value="재원" selected>재원만</option>
+<option value="휴원">휴원만</option>
+<option value="퇴원">퇴원만</option>
+</select>
+</div>
 
 <div id="count" class="count"></div>
 <div id="studentList"></div>
@@ -328,8 +386,6 @@ oninput="renderStudents()">
 <div class="modal-box">
 
 <h2>수련생 정보 수정</h2>
-
-<input type="hidden" id="editId">
 
 <div class="form-grid">
 
@@ -355,7 +411,7 @@ oninput="renderStudents()">
 
 <div class="field">
 <label>수련반</label>
-<input id="editClass">
+<input id="editClass" list="classList">
 </div>
 
 <div class="field">
@@ -386,7 +442,7 @@ oninput="renderStudents()">
 
 <div class="modal-buttons">
 <button class="cancel" onclick="closeEdit()">취소</button>
-<button class="primary" onclick="saveEdit()">수정 저장</button>
+<button class="primary" id="saveEditBtn" onclick="saveEdit()">수정 저장</button>
 </div>
 
 <div id="editMessage" class="message"></div>
@@ -412,14 +468,33 @@ oninput="renderStudents()">
 </div>
 
 
+<!-- 출석사진 크게 보기 -->
+<div id="photoModal" class="modal" onclick="this.style.display='none'">
+<div class="modal-box" style="max-width:520px;text-align:center">
+<h2 id="photoTitle"></h2>
+<img id="photoView" class="photo-view" alt="출석사진">
+<div class="modal-buttons"><button class="cancel">닫기</button></div>
+</div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+
 <script>
 
 const SUPABASE_URL="https://ixuxlblfkoccmwqxsjbw.supabase.co";
 const SUPABASE_KEY="sb_publishable_lmwJJaHfZzE5hXnZnF49oA__F7JpDZ8";
 
+/* 오늘 출석현황 자동 새로고침 간격(초) */
+const AUTO_REFRESH_SECONDS=30;
+
 let adminPassword="";
 let students=[];
 let todayAttendance=[];
+let editingStudent=null;
+let attTab="present";
+let refreshTimer=null;
+let loading=false;
 
 
 async function rpc(name,data){
@@ -438,44 +513,88 @@ body:JSON.stringify(data)
 );
 
 if(!response.ok){
-throw new Error(await response.text());
+const err=new Error(await response.text());
+err.status=response.status;
+throw err;
 }
 
 return await response.json();
 }
 
 
-async function login(){
+/* 로그인 유지용 저장 (저장이 막힌 브라우저에서도 오류 없이 동작) */
+function store(action,value){
+try{
+if(action==="set")sessionStorage.setItem("victoryAdmin",value);
+else if(action==="remove")sessionStorage.removeItem("victoryAdmin");
+else return sessionStorage.getItem("victoryAdmin");
+}catch(e){}
+return null;
+}
 
-const password=document.getElementById("password").value.trim();
+
+function toast(text){
+const el=document.getElementById("toast");
+el.textContent=text;
+el.style.display="block";
+clearTimeout(el._t);
+el._t=setTimeout(()=>el.style.display="none",2600);
+}
+
+
+/* ---------- 로그인 ---------- */
+
+async function login(savedPassword){
+
+const password=(savedPassword||document.getElementById("password").value).trim();
 if(!password)return;
 
 const message=document.getElementById("loginMessage");
+const button=document.getElementById("loginBtn");
 
 message.className="message";
 message.textContent="확인 중...";
+button.disabled=true;
 
 try{
 
 adminPassword=password;
 
-await loadAll();
+await loadAll(true);
+
+/* 브라우저 탭을 닫기 전까지는 새로고침해도 로그인 유지 */
+store("set",password);
 
 document.getElementById("loginScreen").style.display="none";
 document.getElementById("adminScreen").style.display="block";
+message.textContent="";
+
+startAutoRefresh();
 
 }catch(error){
 
+console.error(error);
 adminPassword="";
+store("remove");
 message.className="message error";
-message.textContent="관리자 비밀번호가 틀렸습니다.";
 
+if(error instanceof TypeError){
+message.textContent="인터넷 연결을 확인해주세요.";
+}else{
+message.textContent="관리자 비밀번호가 틀렸습니다.";
+}
+
+}finally{
+button.disabled=false;
 }
 
 }
 
 
 function logout(){
+
+stopAutoRefresh();
+store("remove");
 
 adminPassword="";
 students=[];
@@ -488,25 +607,66 @@ document.getElementById("loginScreen").style.display="block";
 }
 
 
-async function loadAll(){
+/* ---------- 자동 새로고침 ---------- */
 
-await loadStudents();
+function startAutoRefresh(){
+stopAutoRefresh();
+refreshTimer=setInterval(async()=>{
+if(document.visibilityState!=="visible")return;
+if(document.getElementById("editModal").style.display==="flex")return;
+try{
 await loadTodayAttendance();
-
 updateDashboard();
-renderBirthdays();
-
+renderAbsent();
+}catch(e){}
+},AUTO_REFRESH_SECONDS*1000);
 }
 
+function stopAutoRefresh(){
+clearInterval(refreshTimer);
+refreshTimer=null;
+}
 
-async function loadStudents(){
+document.addEventListener("visibilitychange",()=>{
+if(document.visibilityState==="visible" && adminPassword){
+loadAll().catch(()=>{});
+}
+});
 
-students=await rpc(
-"admin_students",
-{admin_password:adminPassword}
-);
+
+async function loadAll(throwOnError){
+
+if(loading && !throwOnError)return;
+loading=true;
+
+try{
+
+const results=await Promise.all([
+rpc("admin_students",{admin_password:adminPassword}),
+rpc("admin_today_attendance",{admin_password:adminPassword})
+]);
+
+students=Array.isArray(results[0])?results[0]:[];
+todayAttendance=Array.isArray(results[1])?results[1]:[];
 
 renderStudents();
+renderTodayAttendance();
+renderAbsent();
+updateDashboard();
+renderBirthdays();
+fillClassList();
+
+}catch(error){
+
+if(throwOnError)throw error;
+console.error(error);
+toast("불러오기 실패: 인터넷 연결을 확인해주세요.");
+
+}finally{
+
+loading=false;
+
+}
 
 }
 
@@ -518,23 +678,54 @@ todayAttendance=await rpc(
 {admin_password:adminPassword}
 );
 
+if(!Array.isArray(todayAttendance))todayAttendance=[];
+
 renderTodayAttendance();
 
 }
 
 
+/* ---------- 대시보드 ---------- */
+
+function activeStudents(){
+return students.filter(s=>(s.status||"재원")==="재원");
+}
+
+/* 오늘 출석한 출석번호 목록 (중복 제거) */
+function attendedPins(){
+return new Set(todayAttendance.map(a=>String(a.pin)));
+}
+
 function updateDashboard(){
 
-const activeStudents=students.filter(s=>s.status==="재원");
+const active=activeStudents();
+const pins=attendedPins();
 
-const total=activeStudents.length;
-const attended=todayAttendance.length;
+const attendedActive=active.filter(s=>pins.has(String(s.pin))).length;
 
-document.getElementById("totalStudents").textContent=total;
-document.getElementById("todayCount").textContent=attended;
+document.getElementById("totalStudents").textContent=active.length;
+document.getElementById("todayCount").textContent=pins.size;
 document.getElementById("absentCount").textContent=
-Math.max(0,total-attended);
+Math.max(0,active.length-attendedActive);
 
+document.getElementById("tabPresent").textContent="출석 "+pins.size;
+document.getElementById("tabAbsent").textContent="미출석 "+Math.max(0,active.length-attendedActive);
+
+document.getElementById("todayLabel").textContent=
+new Date().toLocaleDateString("ko-KR",{year:"numeric",month:"long",day:"numeric",weekday:"long"});
+
+document.getElementById("updatedAt").textContent=
+new Date().toLocaleTimeString("ko-KR",{hour:"2-digit",minute:"2-digit",second:"2-digit"})+" 갱신";
+
+}
+
+
+function setAttTab(tab){
+attTab=tab;
+document.getElementById("tabPresent").classList.toggle("on",tab==="present");
+document.getElementById("tabAbsent").classList.toggle("on",tab==="absent");
+document.getElementById("todayAttendance").style.display=tab==="present"?"block":"none";
+document.getElementById("absentList").style.display=tab==="absent"?"block":"none";
 }
 
 
@@ -551,6 +742,16 @@ return parts[0]+"년 "+Number(parts[1])+"월 "+Number(parts[2])+"일";
 }
 
 
+function el(tag,className,text){
+const e=document.createElement(tag);
+if(className)e.className=className;
+if(text!==undefined&&text!==null)e.textContent=text;
+return e;
+}
+
+
+/* ---------- 오늘 출석 목록 ---------- */
+
 function renderTodayAttendance(){
 
 const box=document.getElementById("todayAttendance");
@@ -558,61 +759,60 @@ box.innerHTML="";
 
 if(todayAttendance.length===0){
 
-box.innerHTML=
-'<div class="empty">아직 오늘 출석한 수련생이 없습니다.</div>';
-
+box.appendChild(el("div","empty","아직 오늘 출석한 수련생이 없습니다."));
 return;
+
 }
 
-todayAttendance.forEach(a=>{
+/* 최근 출석이 위로 */
+const list=[...todayAttendance].sort((a,b)=>
+new Date(b.checked_at)-new Date(a.checked_at)
+);
 
-const row=document.createElement("div");
-row.className="attendance-item";
+list.forEach(a=>{
 
-const left=document.createElement("div");
+const row=el("div","attendance-item");
 
-const name=document.createElement("div");
-name.className="att-name";
-name.textContent=a.name;
+const left=el("div","att-left");
 
-const detail=document.createElement("div");
-detail.className="att-detail";
+/* 출석사진이 있으면 작게 표시 (누르면 크게) */
+const photoUrl=a.photo_url||a.photo||a.image_url||"";
 
-detail.textContent=[
+if(photoUrl){
+const img=el("img","att-photo");
+img.src=photoUrl;
+img.alt=a.name+" 출석사진";
+img.loading="lazy";
+img.onclick=()=>openPhoto(a.name,photoUrl);
+left.appendChild(img);
+}
+
+const textBox=el("div");
+
+textBox.appendChild(el("div","att-name",a.name));
+
+textBox.appendChild(el("div","att-detail",[
 a.class_name,
 a.school,
 a.grade,
 a.belt,
 "출석번호 "+a.pin
-].filter(Boolean).join(" · ");
+].filter(Boolean).join(" · ")));
 
-left.appendChild(name);
-left.appendChild(detail);
+left.appendChild(textBox);
 
 
-const right=document.createElement("div");
-right.className="att-right";
-
-const time=document.createElement("div");
-time.className="att-time";
+const right=el("div","att-right");
 
 const date=new Date(a.checked_at);
 
-time.textContent=date.toLocaleTimeString(
-"ko-KR",
-{
-hour:"2-digit",
-minute:"2-digit"
-}
-);
+right.appendChild(el("div","att-time",
+isNaN(date.getTime())?"-":date.toLocaleTimeString("ko-KR",{hour:"2-digit",minute:"2-digit"})
+));
 
-
-const deleteButton=document.createElement("button");
-deleteButton.className="att-delete";
-deleteButton.textContent="출석 삭제";
+const deleteButton=el("button","att-delete","출석 삭제");
 deleteButton.onclick=()=>deleteAttendance(a);
 
-right.appendChild(time);
 right.appendChild(deleteButton);
 
 row.appendChild(left);
@@ -621,6 +821,106 @@ row.appendChild(right);
 box.appendChild(row);
 
 });
+
+}
+
+
+/* ---------- 오늘 미출석 목록 + 수동 출석 ---------- */
+
+function renderAbsent(){
+
+const box=document.getElementById("absentList");
+box.innerHTML="";
+
+const pins=attendedPins();
+
+const absent=activeStudents()
+.filter(s=>!pins.has(String(s.pin)))
+.sort((a,b)=>(a.class_name||"").localeCompare(b.class_name||"","ko")||(a.name||"").localeCompare(b.name||"","ko"));
+
+if(absent.length===0){
+box.appendChild(el("div","empty","재원생 모두 출석했습니다 👏"));
+return;
+}
+
+absent.forEach(s=>{
+
+const row=el("div","attendance-item");
+
+const left=el("div");
+left.appendChild(el("div","att-name",s.name));
+left.appendChild(el("div","att-detail",[
+s.class_name,
+s.school,
+s.grade,
+"출석번호 "+s.pin,
+s.parent_phone
+].filter(Boolean).join(" · ")));
+
+const right=el("div","att-right");
+const btn=el("button","att-check","출석 처리");
+btn.onclick=()=>manualCheck(s,btn);
+right.appendChild(btn);
+
+row.appendChild(left);
+row.appendChild(right);
+box.appendChild(row);
+
+});
+
+}
+
+
+async function manualCheck(s,btn){
+
+if(!confirm(s.name+" 수련생을 지금 출석 처리할까요?"))return;
+
+const notify=confirm("부모님께 출석 알림도 보낼까요?\n\n확인 = 알림 보냄 / 취소 = 기록만");
+
+btn.disabled=true;
+btn.textContent="처리 중...";
+
+try{
+
+/* 출석 화면과 같은 출석 처리 기능 사용 */
+const result=await rpc("check_attendance",{input_pin:String(s.pin)});
+
+if(!result.success){
+toast(result.already?(s.name+" 수련생은 이미 출석했습니다."):(result.message||"출석 처리 실패"));
+await loadAll();
+return;
+}
+
+let pushText="";
+
+if(notify){
+try{
+const r=await fetch(SUPABASE_URL+"/functions/v1/send-push",{
+method:"POST",
+headers:{
+"Content-Type":"application/json",
+"apikey":SUPABASE_KEY,
+"Authorization":"Bearer "+SUPABASE_KEY
+},
+body:JSON.stringify({pin:String(s.pin)})
+});
+pushText=r.ok?" · 부모님 알림 보냄":" · 알림 실패";
+}catch(e){
+pushText=" · 알림 실패";
+}
+}
+
+toast(s.name+" 출석 처리 완료"+pushText);
+await loadAll();
+
+}catch(error){
+
+console.error(error);
+toast("출석 처리 중 오류가 발생했습니다.");
+btn.disabled=false;
+btn.textContent="출석 처리";
+
+}
 
 }
 
@@ -646,6 +946,7 @@ alert(result.message);
 return;
 }
 
+toast(a.name+" 출석 기록을 삭제했습니다.");
 await loadAll();
 
 }catch(error){
@@ -657,10 +958,19 @@ alert("출석 삭제 중 오류가 발생했습니다.");
 }
 
 
+function openPhoto(name,url){
+document.getElementById("photoTitle").textContent=name+" 출석사진";
+document.getElementById("photoView").src=url;
+document.getElementById("photoModal").style.display="flex";
+}
+
+
+/* ---------- 생일 ---------- */
+
 function getBirthdayStudents(){
 
 return students
-.filter(s=>s.status==="재원" && s.birth_date)
+.filter(s=>(s.status||"재원")==="재원" && s.birth_date)
 .sort((a,b)=>{
 
 const aa=a.birth_date.substring(5);
@@ -675,7 +985,9 @@ return aa.localeCompare(bb);
 
 function renderBirthdays(){
 
-const currentMonth=new Date().getMonth()+1;
+const now=new Date();
+const currentMonth=now.getMonth()+1;
+const todayMD=String(currentMonth).padStart(2,"0")+"-"+String(now.getDate()).padStart(2,"0");
 
 const birthdays=getBirthdayStudents();
 
@@ -692,31 +1004,24 @@ box.innerHTML="";
 
 if(monthly.length===0){
 
-box.innerHTML=
-'<div class="empty">이번 달 생일인 관원생이 없습니다.</div>';
-
+box.appendChild(el("div","empty","이번 달 생일인 관원생이 없습니다."));
 return;
+
 }
 
 monthly.forEach(s=>{
 
-const item=document.createElement("div");
-item.className="birthday-item";
+const item=el("div","birthday-item");
 
-const name=document.createElement("div");
-name.className="birthday-name";
-name.textContent="🎂 "+s.name;
+const isToday=s.birth_date.substring(5)===todayMD;
 
-const date=document.createElement("div");
-date.className="birthday-date";
+item.appendChild(el("div","birthday-name",(isToday?"🎉 오늘! ":"🎂 ")+s.name));
 
 const p=s.birth_date.split("-");
 
-date.textContent=
-Number(p[1])+"월 "+Number(p[2])+"일";
+item.appendChild(el("div","birthday-date",Number(p[1])+"월 "+Number(p[2])+"일"));
 
-item.appendChild(name);
-item.appendChild(date);
+if(isToday)item.style.background="#fff4f7";
 
 box.appendChild(item);
 
@@ -735,8 +1040,7 @@ const birthdays=getBirthdayStudents();
 
 if(birthdays.length===0){
 
-box.innerHTML=
-'<div class="empty">생년월일이 등록된 관원생이 없습니다.</div>';
+box.appendChild(el("div","empty","생년월일이 등록된 관원생이 없습니다."));
 
 }else{
 
@@ -748,31 +1052,17 @@ Number(s.birth_date.split("-")[1])===month
 
 if(monthly.length===0)continue;
 
-const title=document.createElement("div");
-title.className="month-title";
-title.textContent=month+"월 · "+monthly.length+"명";
-
-box.appendChild(title);
+box.appendChild(el("div","month-title",month+"월 · "+monthly.length+"명"));
 
 monthly.forEach(s=>{
 
-const item=document.createElement("div");
-item.className="birthday-item";
+const item=el("div","birthday-item");
 
-const name=document.createElement("div");
-name.className="birthday-name";
-name.textContent=s.name+" · "+s.pin;
-
-const date=document.createElement("div");
-date.className="birthday-date";
+item.appendChild(el("div","birthday-name",s.name+" · "+s.pin));
 
 const p=s.birth_date.split("-");
 
-date.textContent=
-Number(p[1])+"월 "+Number(p[2])+"일";
-
-item.appendChild(name);
-item.appendChild(date);
+item.appendChild(el("div","birthday-date",Number(p[1])+"월 "+Number(p[2])+"일"));
 
 box.appendChild(item);
 
@@ -794,11 +1084,30 @@ document.getElementById("birthdayModal").style.display="none";
 }
 
 
+/* ---------- 수련생 등록 ---------- */
+
+function fillClassList(){
+const classes=[...new Set(students.map(s=>s.class_name).filter(Boolean))].sort();
+const list=document.getElementById("classList");
+list.innerHTML="";
+classes.forEach(c=>{
+const o=document.createElement("option");
+o.value=c;
+list.appendChild(o);
+});
+}
+
+/* 출석번호 중복을 저장 전에 미리 확인 */
+function pinOwner(pin,exceptId){
+return students.find(s=>String(s.pin)===String(pin) && String(s.id)!==String(exceptId));
+}
+
 async function addStudent(){
 
 const name=document.getElementById("name").value.trim();
 const pin=document.getElementById("pin").value.trim();
 const message=document.getElementById("addMessage");
+const button=document.getElementById("addBtn");
 
 if(!name){
 
@@ -816,8 +1125,19 @@ return;
 
 }
 
+const owner=pinOwner(pin,null);
+
+if(owner){
+
+message.className="message error";
+message.textContent="출석번호 "+pin+"은(는) 이미 "+owner.name+" 수련생이 사용 중입니다.";
+return;
+
+}
+
 message.className="message";
 message.textContent="등록 중...";
+button.disabled=true;
 
 try{
 
@@ -845,7 +1165,7 @@ return;
 }
 
 message.className="message success";
-message.textContent="수련생 등록 완료!";
+message.textContent=name+" 수련생 등록 완료! (출석번호 "+pin+")";
 
 [
 "name","pin","phone","birthDate",
@@ -861,10 +1181,16 @@ console.error(error);
 message.className="message error";
 message.textContent="등록 중 오류가 발생했습니다.";
 
-}
+}finally{
+
+button.disabled=false;
 
 }
 
+}
+
+
+/* ---------- 수련생 목록 ---------- */
 
 function renderStudents(){
 
@@ -872,22 +1198,33 @@ const search=document.getElementById("search");
 if(!search)return;
 
 const keyword=search.value.trim().toLowerCase();
+const status=document.getElementById("statusFilter").value;
 
 const filtered=students.filter(s=>{
+
+if(status && (s.status||"재원")!==status)return false;
 
 const text=[
 s.name,
 s.pin,
 s.parent_phone,
-s.birth_date
+String(s.parent_phone||"").replace(/\D/g,""),
+s.birth_date,
+s.class_name,
+s.school,
+s.grade,
+s.belt
 ].join(" ").toLowerCase();
 
 return text.includes(keyword);
 
-});
+}).sort((a,b)=>(a.name||"").localeCompare(b.name||"","ko"));
+
+const byStatus={재원:0,휴원:0,퇴원:0};
+students.forEach(s=>{byStatus[s.status||"재원"]=(byStatus[s.status||"재원"]||0)+1;});
 
 document.getElementById("count").textContent=
-"총 "+filtered.length+"명";
+"검색 결과 "+filtered.length+"명 · 전체 재원 "+byStatus.재원+" / 휴원 "+byStatus.휴원+" / 퇴원 "+byStatus.퇴원;
 
 const list=document.getElementById("studentList");
 
@@ -895,9 +1232,7 @@ list.innerHTML="";
 
 if(filtered.length===0){
 
-list.innerHTML=
-'<div class="empty">등록된 수련생이 없습니다.</div>';
-
+list.appendChild(el("div","empty","해당하는 수련생이 없습니다."));
 return;
 
 }
@@ -905,39 +1240,42 @@ return;
 
 filtered.forEach(s=>{
 
-const item=document.createElement("div");
-item.className="student";
+const st=s.status||"재원";
 
-const info=document.createElement("div");
-info.className="student-info";
+const item=el("div","student"+(st!=="재원"?" off":""));
 
-const name=document.createElement("div");
-name.className="student-name";
-name.textContent=s.name;
+const info=el("div","student-info");
 
-const main=document.createElement("div");
-main.className="student-main";
+const name=el("div","student-name");
+name.appendChild(el("span","",s.name));
+name.appendChild(el("span","badge "+st,st));
 
-main.innerHTML=
-"<div><strong>출석번호</strong> "+(s.pin||"-")+"</div>"+
-"<div><strong>학부모 연락처</strong> "+(s.parent_phone||"-")+"</div>"+
-"<div><strong>생년월일</strong> "+formatBirthDate(s.birth_date)+"</div>";
+const main=el("div","student-main");
+
+[
+["출석번호",s.pin||"-"],
+["학부모 연락처",s.parent_phone||"-"],
+["생년월일",formatBirthDate(s.birth_date)]
+].forEach(([k,v])=>{
+const d=el("div");
+d.appendChild(el("strong","",k));
+d.appendChild(document.createTextNode(" "+v));
+main.appendChild(d);
+});
 
 info.appendChild(name);
 info.appendChild(main);
 
+const sub=[s.class_name,s.school,s.grade,s.belt].filter(Boolean).join(" · ");
+if(sub)info.appendChild(el("div","student-sub",sub));
 
-const buttons=document.createElement("div");
-buttons.className="buttons";
 
-const edit=document.createElement("button");
-edit.className="edit";
-edit.textContent="수정";
+const buttons=el("div","buttons");
+
+const edit=el("button","edit","수정");
 edit.onclick=()=>openEdit(s);
 
-const del=document.createElement("button");
-del.className="delete";
-del.textContent="삭제";
+const del=el("button","delete","삭제");
 del.onclick=()=>deleteStudent(s);
 
 buttons.appendChild(edit);
@@ -953,9 +1291,30 @@ list.appendChild(item);
 }
 
 
+function exportStudents(){
+
+const rows=[["이름","출석번호","학부모연락처","생년월일","수련반","학교","학년","띠","상태"]];
+
+[...students]
+.sort((a,b)=>(a.name||"").localeCompare(b.name||"","ko"))
+.forEach(s=>rows.push([s.name,s.pin,s.parent_phone,s.birth_date,s.class_name,s.school,s.grade,s.belt,s.status||"재원"]));
+
+const csv="\ufeff"+rows.map(r=>r.map(v=>'"'+String(v??"").replace(/"/g,'""')+'"').join(",")).join("\r\n");
+
+const a=document.createElement("a");
+a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
+a.download="승리태권도_수련생명단_"+new Date().toISOString().slice(0,10)+".csv";
+a.click();
+
+}
+
+
+/* ---------- 수정 ---------- */
+
 function openEdit(s){
 
-document.getElementById("editId").value=s.id;
+editingStudent=s;
+
 document.getElementById("editName").value=s.name||"";
 document.getElementById("editPin").value=s.pin||"";
 document.getElementById("editPhone").value=s.parent_phone||"";
@@ -974,6 +1333,7 @@ document.getElementById("editModal").style.display="flex";
 
 function closeEdit(){
 
+editingStudent=null;
 document.getElementById("editModal").style.display="none";
 
 }
@@ -981,8 +1341,18 @@ document.getElementById("editModal").style.display="none";
 
 async function saveEdit(){
 
+if(!editingStudent)return;
+
 const pin=document.getElementById("editPin").value.trim();
+const name=document.getElementById("editName").value.trim();
 const message=document.getElementById("editMessage");
+const button=document.getElementById("saveEditBtn");
+
+if(!name){
+message.className="message error";
+message.textContent="이름을 입력해주세요.";
+return;
+}
 
 if(!/^\d{4}$/.test(pin)){
 
@@ -992,14 +1362,24 @@ return;
 
 }
 
+const owner=pinOwner(pin,editingStudent.id);
+
+if(owner){
+message.className="message error";
+message.textContent="출석번호 "+pin+"은(는) 이미 "+owner.name+" 수련생이 사용 중입니다.";
+return;
+}
+
+button.disabled=true;
+
 try{
 
 const result=await rpc(
 "admin_update_student",
 {
 admin_password:adminPassword,
-student_id:Number(document.getElementById("editId").value),
-student_name:document.getElementById("editName").value.trim(),
+student_id:editingStudent.id,
+student_name:name,
 student_pin:pin,
 student_parent_phone:document.getElementById("editPhone").value.trim(),
 student_birth_date:document.getElementById("editBirthDate").value || null,
@@ -1019,8 +1399,9 @@ return;
 
 }
 
-await loadAll();
+toast(name+" 정보를 저장했습니다.");
 closeEdit();
+await loadAll();
 
 }catch(error){
 
@@ -1028,6 +1409,10 @@ console.error(error);
 
 message.className="message error";
 message.textContent="수정 중 오류가 발생했습니다.";
+
+}finally{
+
+button.disabled=false;
 
 }
 
@@ -1039,7 +1424,8 @@ async function deleteStudent(s){
 if(!confirm(
 s.name+
 " 수련생을 정말 삭제하시겠습니까?\n\n"+
-"학생을 삭제하면 출석기록과 부모님 알림등록도 함께 삭제됩니다."
+"학생을 삭제하면 출석기록과 부모님 알림등록도 함께 삭제됩니다.\n"+
+"(그만둔 경우에는 삭제 대신 [수정 → 상태: 퇴원]을 추천합니다)"
 ))return;
 
 try{
@@ -1059,6 +1445,7 @@ return;
 
 }
 
+toast(s.name+" 수련생을 삭제했습니다.");
 await loadAll();
 
 }catch(error){
@@ -1068,6 +1455,11 @@ alert("삭제 중 오류가 발생했습니다.");
 }
 
 }
+
+
+/* 새로고침해도 로그인 유지 */
+const savedPw=store("get");
+if(savedPw)login(savedPw);
 
 </script>
 
