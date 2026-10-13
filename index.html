@@ -690,6 +690,7 @@ async function openCamera(){
       document.getElementById("cameraModal").style.display="flex";
       await video.play();
       photoMessage.textContent="";
+      startCameraCountdown();
 
     }catch(secondError){
       console.error("셀카 우선 실행 오류:",secondError);
@@ -708,8 +709,12 @@ function cancelCameraCountdown(){
 
 function startCameraCountdown(){
   const video=document.getElementById("cameraVideo");
-  if(!cameraStream || !video.videoWidth){
+  if(!cameraStream)return;
+  if(!video.videoWidth || !video.videoHeight){
     document.getElementById("photoMessage").textContent="카메라 준비 중입니다. 잠시 기다려주세요.";
+    video.addEventListener("loadeddata", ()=>{
+      if(cameraStream && document.getElementById("cameraModal").style.display==="flex") startCameraCountdown();
+    }, {once:true});
     return;
   }
   cancelCameraCountdown();
@@ -723,7 +728,8 @@ function startCameraCountdown(){
       el.textContent=String(remaining--);
       countdownTimer=setTimeout(tick,1000);
     }else{
-      cancelCameraCountdown();
+      // 촬영을 먼저 시작하고 카운트다운을 종료합니다.
+      // 동영상 프레임이 준비되지 않았다면 사용자에게 오류를 보여줍니다.
       takeSelfie();
     }
   };
@@ -772,7 +778,11 @@ async function takeSelfie(){
 
   const video=document.getElementById("cameraVideo");
 
-  if(!video.videoWidth || !video.videoHeight)return;
+  if(!video.videoWidth || !video.videoHeight){
+    cancelCameraCountdown();
+    document.getElementById("photoMessage").textContent="카메라 화면이 준비되지 않았습니다. 다시 찍기를 눌러주세요.";
+    return;
+  }
 
   try{
     const MAX_SIZE=1280;
@@ -805,6 +815,7 @@ async function takeSelfie(){
 
     if(!blob)throw new Error("사진 변환 실패");
 
+    cancelCameraCountdown();
     selectedPhoto=new File(
       [blob],
       "attendance.jpg",
@@ -836,6 +847,7 @@ async function takeSelfie(){
     },300);
 
   }catch(error){
+    cancelCameraCountdown();
     console.error("셀카 촬영 오류:",error);
     document.getElementById("photoMessage").textContent=
       "사진 촬영에 실패했습니다. 다시 시도해주세요.";
