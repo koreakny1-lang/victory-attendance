@@ -490,7 +490,7 @@ function updateDots(){
 
 /* 부모님 푸시 */
 
-async function sendParentPush(attendancePin){
+async function sendParentPush(attendancePin, action="attendance"){
 
   try{
 
@@ -503,7 +503,8 @@ async function sendParentPush(attendancePin){
           "Content-Type":"application/json"
         },
         body:JSON.stringify({
-          pin:attendancePin
+          pin:attendancePin,
+           action:action
         })
       }
     );
@@ -573,7 +574,8 @@ async function checkAttendance(){
         },
 
         body:JSON.stringify({
-          input_pin:attendancePin
+          input_pin:attendancePin,
+           action:action
         })
       }
     );
@@ -588,6 +590,7 @@ async function checkAttendance(){
     if(result.success){
 
       if(result.action === "departure"){
+        sendParentPush(attendancePin, "departure");
         showDeparture(result.name);
       }else{
         sendParentPush(attendancePin);
