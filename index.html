@@ -242,6 +242,8 @@ button{
 #cameraVideo{width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
 .camera-controls{flex:0 0 auto;background:#111;padding:18px 20px calc(18px + env(safe-area-inset-bottom));display:flex;align-items:center;justify-content:space-between;gap:14px}
 .camera-control{min-width:92px;min-height:52px;border-radius:14px;background:#303030;color:#fff;font-size:16px;font-weight:800}
+.camera-countdown{position:absolute;inset:0;display:none;align-items:center;justify-content:center;pointer-events:none;color:white;font-size:clamp(110px,32vw,230px);font-weight:900;text-shadow:0 5px 24px rgba(0,0,0,.85);z-index:2}
+.camera-video-wrap{position:relative}
 .camera-shutter{width:76px;height:76px;flex:0 0 76px;border-radius:50%;background:#fff;border:7px solid #aaa}
 
 @media(max-width:500px){
@@ -321,14 +323,14 @@ onclick="checkAttendance()">
 <div class="photo-area">
 
 <div class="photo-guide">
-출석사진을 촬영할 수 있습니다.
+카메라가 열리면 3 · 2 · 1 후 자동 촬영됩니다.
 </div>
 
 <button
 id="cameraBtn"
 class="photo-button"
 onclick="openCamera()">
-📷 출석사진 찍기
+📷 다시 카메라 열기
 </button>
 
 <input
@@ -383,10 +385,11 @@ onclick="finishAndReset()">
 <div id="cameraModal" class="camera-modal">
   <div class="camera-video-wrap">
     <video id="cameraVideo" autoplay playsinline muted></video>
+    <div id="cameraCountdown" class="camera-countdown" aria-live="polite"></div>
   </div>
   <div class="camera-controls">
     <button type="button" class="camera-control" onclick="closeCamera()">취소</button>
-    <button type="button" class="camera-shutter" aria-label="사진 촬영" onclick="takeSelfie()"></button>
+    <button type="button" class="camera-shutter" aria-label="3초 후 사진 촬영" onclick="startCameraCountdown()"></button>
     <button type="button" class="camera-control" onclick="switchCamera()">카메라 전환</button>
   </div>
 </div>
@@ -407,6 +410,8 @@ let selectedPhoto=null;
 let cameraStream=null;
 let currentFacingMode="user";
 let photoUploading=false;
+let countdownTimer=null;
+let countdownToken=0;
 
 
 /* 숫자 입력 */
@@ -630,6 +635,8 @@ function showSuccess(name){
   );
 
   clearPhoto();
+  // 출석이 완료되면 카메라를 자동으로 열고 3, 2, 1 후 촬영합니다.
+  openCamera();
 }
 
 
@@ -660,6 +667,7 @@ async function openCamera(){
     document.getElementById("cameraModal").style.display="flex";
     await video.play();
     photoMessage.textContent="";
+    startCameraCountdown();
 
   }catch(error){
     console.error("셀카 카메라 실행 오류:",error);
@@ -691,6 +699,37 @@ async function openCamera(){
   }
 }
 
+function cancelCameraCountdown(){
+  countdownToken++;
+  if(countdownTimer!==null){clearTimeout(countdownTimer);countdownTimer=null;}
+  const el=document.getElementById("cameraCountdown");
+  if(el){el.style.display="none";el.textContent="";}
+}
+
+function startCameraCountdown(){
+  const video=document.getElementById("cameraVideo");
+  if(!cameraStream || !video.videoWidth){
+    document.getElementById("photoMessage").textContent="카메라 준비 중입니다. 잠시 기다려주세요.";
+    return;
+  }
+  cancelCameraCountdown();
+  const token=countdownToken;
+  const el=document.getElementById("cameraCountdown");
+  let remaining=3;
+  el.style.display="flex";
+  const tick=()=>{
+    if(token!==countdownToken || !cameraStream)return;
+    if(remaining>0){
+      el.textContent=String(remaining--);
+      countdownTimer=setTimeout(tick,1000);
+    }else{
+      cancelCameraCountdown();
+      takeSelfie();
+    }
+  };
+  tick();
+}
+
 function closeCameraStreamOnly(){
   if(cameraStream){
     cameraStream.getTracks().forEach(track=>track.stop());
@@ -699,6 +738,7 @@ function closeCameraStreamOnly(){
 }
 
 function closeCamera(){
+  cancelCameraCountdown();
   closeCameraStreamOnly();
   const video=document.getElementById("cameraVideo");
   video.srcObject=null;
@@ -706,6 +746,7 @@ function closeCamera(){
 }
 
 async function switchCamera(){
+  cancelCameraCountdown();
   try{
     currentFacingMode=currentFacingMode==="user" ? "environment" : "user";
     closeCameraStreamOnly();
@@ -719,6 +760,7 @@ async function switchCamera(){
     video.style.transform=currentFacingMode==="user" ? "scaleX(-1)" : "none";
     video.srcObject=cameraStream;
     await video.play();
+    startCameraCountdown();
 
   }catch(error){
     console.error("카메라 전환 오류:",error);
