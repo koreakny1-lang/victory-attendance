@@ -819,8 +819,6 @@ right.appendChild(el("div","att-time",
 if(a.departed_at){
   const departed=new Date(a.departed_at);
   right.appendChild(el("div","att-departed","🏠 귀가 "+(isNaN(departed.getTime())?"-":departed.toLocaleTimeString("ko-KR",{hour:"2-digit",minute:"2-digit"}))));
-}else{
-  right.appendChild(el("div","att-status","🥋 수련 중"));
 }
 
 const deleteButton=el("button","att-delete","출석 삭제");
