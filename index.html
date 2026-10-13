@@ -316,11 +316,11 @@ onclick="checkAttendance()">
 
 <div id="successScreen" class="success-card">
 
-<div class="check">✓</div>
+<div id="successIcon" class="check">✓</div>
 
 <div id="studentName" class="student-name"></div>
 
-<div class="complete-text">
+<div id="completeText" class="complete-text">
 출석 완료!
 </div>
 
@@ -587,9 +587,12 @@ async function checkAttendance(){
 
     if(result.success){
 
-      sendParentPush(attendancePin);
-
-      showSuccess(result.name);
+      if(result.action === "departure"){
+        showDeparture(result.name);
+      }else{
+        sendParentPush(attendancePin);
+        showSuccess(result.name);
+      }
 
     }else{
 
@@ -598,8 +601,7 @@ async function checkAttendance(){
       if(result.already){
 
         message.textContent=
-        result.name+
-        " 수련생은 이미 출석했습니다.";
+        result.message || (result.name + " 수련생은 이미 출석과 귀가를 완료했습니다.");
 
       }else{
 
@@ -639,6 +641,10 @@ async function checkAttendance(){
 
 function showSuccess(name){
   currentStudentName=name;
+  document.getElementById("successIcon").textContent="✓";
+  document.getElementById("completeText").textContent="출석 완료!";
+  document.getElementById("successIcon").style.background="#08a64d";
+  document.querySelector("#successScreen .photo-area").style.display="block";
 
   document.getElementById(
     "checkScreen"
@@ -669,6 +675,25 @@ function showSuccess(name){
   openCamera();
 }
 
+
+/* 두 번째 입력: 귀가 완료. 사진 촬영은 하지 않습니다. */
+function showDeparture(name){
+  clearPhoto();
+  document.getElementById("checkScreen").style.display="none";
+  document.getElementById("successScreen").style.display="block";
+  document.getElementById("studentName").textContent=name+" 수련생";
+  document.getElementById("successIcon").textContent="⌂";
+  document.getElementById("successIcon").style.background="#1765bd";
+  document.getElementById("completeText").textContent="귀가 완료!";
+  document.getElementById("checkTime").textContent=new Date().toLocaleTimeString("ko-KR",{hour:"2-digit",minute:"2-digit"});
+  document.querySelector("#successScreen .photo-area").style.display="none";
+  setTimeout(()=>{
+    if(document.getElementById("successScreen").style.display==="block" &&
+       document.getElementById("completeText").textContent==="귀가 완료!"){
+      finishAndReset();
+    }
+  },2500);
+}
 
 /* 카메라 */
 
