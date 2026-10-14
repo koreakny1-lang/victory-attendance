@@ -228,37 +228,10 @@ header h1{color:#fff}
 .primary{background:var(--dojo-primary,#062b5c)}
 @media(max-width:650px){.home-grid{grid-template-columns:1fr 1fr;gap:9px}.home-grid button{padding:14px;min-height:125px}.home-grid strong{font-size:16px}.manage-nav{top:68px;gap:5px}.manage-nav button{font-size:12px;padding:9px 10px}}
 
-input[type="color"]{width:54px!important;max-width:54px!important;height:40px!important;padding:3px!important;cursor:pointer} .security-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.security-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .security-grid .full{grid-column:1/-1}
 .security-status{border-radius:10px;background:#f0f5ff;padding:12px;margin:12px 0;color:#24456c;font-size:14px}
 @media(max-width:650px){.security-grid{grid-template-columns:1fr}}
-
-.history-controls{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:16px 0}
-.history-controls .field input,.history-controls .field select{width:100%;min-width:0}
-.history-buttons{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.history-buttons .primary{width:auto;min-width:135px}
-.history-stats{display:flex;flex-wrap:wrap;gap:10px;margin:16px 0}.history-stats span{background:#edf3fb;border-radius:10px;padding:12px 16px;font-weight:700}
-.history-scroll{overflow-x:auto}.history-table{width:100%;border-collapse:collapse;min-width:500px;font-size:14px}.history-table th,.history-table td{border-bottom:1px solid #e5eaf1;padding:12px 8px;text-align:left}.history-table th{background:#f3f6fb;color:#324b6b}
-.history-calendar{background:#f7faff;padding:14px;border-radius:14px;margin:15px 0}.history-calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}.history-day{text-align:center;min-height:55px;border-radius:9px;padding:7px 2px;background:#fff;font-size:13px}.history-day.yes{background:#dff4e7;color:#087040;font-weight:800}.history-day small{display:block;font-size:10px;margin-top:4px}.history-day.empty{background:transparent}.history-cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:10px}
-@media(max-width:700px){.history-controls{grid-template-columns:repeat(2,minmax(0,1fr))}}
-
-/* 날짜별 수련생 출석 현황 바둑판 */
-.daily-board{margin:18px 0;padding:16px;border:1px solid #dce5f1;border-radius:14px;background:#fbfdff}
-.daily-board-head{display:flex;align-items:end;gap:12px;flex-wrap:wrap;justify-content:space-between}
-.daily-board-head h3{margin:0 0 5px;font-size:19px}.daily-board-head p{margin:0;color:#68798b;font-size:12px}
-.daily-board-head .field{max-width:190px;min-width:150px}.daily-board-head input{width:100%}
-.daily-board-summary{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
-.daily-board-summary span{padding:8px 12px;background:#eaf0f8;border-radius:9px;font-weight:700;font-size:13px}
-.daily-board-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px}
-.daily-board-tile{min-width:0;padding:12px 8px;border-radius:12px;border:1px solid #e2e7ef;background:#f2f4f7;text-align:center}
-.daily-board-tile.present{background:#e1f6e9;border-color:#a9dfbf}
-.daily-board-tile.departed{background:#e7efff;border-color:#b4c9fa}
-.daily-board-tile strong{display:block;font-size:14px;overflow-wrap:anywhere}
-.daily-board-tile small{display:block;font-size:11px;margin-top:5px;color:#526274}
-.daily-board-tile .daily-status{display:block;font-weight:700;margin-top:7px;font-size:12px}
-.daily-board-tile.present .daily-status{color:#08743b}.daily-board-tile.departed .daily-status{color:#234da8}
-.daily-board-empty{padding:20px 0;color:#63758a}
-@media(max-width:700px){.daily-board-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media(max-width:420px){.daily-board-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
 </head>
 
@@ -301,7 +274,6 @@ onkeydown="if(event.key==='Enter') login()">
 <nav class="manage-nav" aria-label="관리자 메뉴">
 <button type="button" data-page="home" onclick="openAdminPage('home')">🏠 홈</button>
 <button type="button" data-page="attendance" onclick="openAdminPage('attendance')">📋 출결 관리</button>
-<button type="button" data-page="history" onclick="openAdminPage('history')">📆 전체 출석 기록</button>
 <button type="button" data-page="students" onclick="openAdminPage('students')">👨‍🎓 수련생 관리</button>
 <button type="button" data-page="birthday" onclick="openAdminPage('birthday')">🎂 생일 관리</button>
 
@@ -313,7 +285,6 @@ onkeydown="if(event.key==='Enter') login()">
 <p class="settings-note">필요한 메뉴를 선택하면 해당 관리 화면으로 이동합니다.</p>
 <div class="home-grid">
 <button onclick="openAdminPage('attendance')">📋<strong>출결 관리</strong><span>출석·미출석 확인 및 처리</span></button>
-<button onclick="openAdminPage('history')">📆<strong>전체 출석 기록</strong><span>기간별 조회·개인별 달력</span></button>
 <button onclick="openAdminPage('students')">👨‍🎓<strong>수련생 관리</strong><span>등록·수정·명단 관리</span></button>
 <button onclick="openAdminPage('birthday')">🎂<strong>생일 관리</strong><span>이번 달 생일 확인</span></button>
 
@@ -336,17 +307,14 @@ onkeydown="if(event.key==='Enter') login()">
 <button type="button" class="primary" id="dojoSaveBtn" onclick="saveDojoSettings()">도장 설정 저장</button>
 <div id="dojoSettingsMessage" class="message" role="status"></div>
 </section>
-
-<section class="card" id="dojoUiSettingsCard"><h2>🛠 화면·알림 항목 수정</h2><p class="settings-note">설정 저장 후 출석체크기와 학부모 화면에 반영됩니다. 알림 문구는 발송 함수도 별도로 연결해야 반영됩니다. 앱 아이콘은 이미지 파일 교체가 필요합니다.</p><div class="form-grid"><div class="field full"><label for="ui_kiosk_title">출석체크기 제목</label><input id="ui_kiosk_title" type="text" data-key="kiosk_title" value="출석체크" maxlength="120"></div><div class="field full"><label for="ui_kiosk_guide">출석체크기 안내 문구</label><input id="ui_kiosk_guide" type="text" data-key="kiosk_guide" value="출석번호 4자리를 입력해주세요" maxlength="120"></div><div class="field "><label for="ui_kiosk_bg">출석체크기 배경색</label><input id="ui_kiosk_bg" type="color" data-key="kiosk_bg" value="#f4f7fb" maxlength="120"></div><div class="field full"><label for="ui_parent_subtitle">학부모 화면 설명</label><input id="ui_parent_subtitle" type="text" data-key="parent_subtitle" value="학부모 출석확인 · 전체 기록" maxlength="120"></div><div class="field full"><label for="ui_parent_guide">학부모 안내 문구</label><input id="ui_parent_guide" type="text" data-key="parent_guide" value="자녀의 출석번호 4자리를 입력해 주세요." maxlength="120"></div><div class="field "><label for="ui_parent_bg">학부모 화면 배경색</label><input id="ui_parent_bg" type="color" data-key="parent_bg" value="#f3f6fb" maxlength="120"></div><div class="field full"><label for="ui_push_attendance">출석 알림 문구 (이름·시간은 자동 포함)</label><input id="ui_push_attendance" type="text" data-key="push_attendance" value="출석했습니다." maxlength="120"></div><div class="field full"><label for="ui_push_departure">귀가 알림 문구 (이름·시간은 자동 포함)</label><input id="ui_push_departure" type="text" data-key="push_departure" value="귀가했습니다." maxlength="120"></div><div class="field full"><label for="ui_app_name">앱 표시 이름 (홈 화면 아이콘 이름은 재설치 필요)</label><input id="ui_app_name" type="text" data-key="app_name" value="승리태권도" maxlength="120"></div></div><button type="button" class="primary" id="uiSaveBtn" onclick="saveUiSettings()">화면 항목 저장</button><div id="uiSaveMessage" class="message"></div></section>
-<section class="card" id="studentFieldSettings"><h2>🧩 수련생 관리 항목 설정</h2><p class="settings-note">기본 항목의 표시 이름과 숨김 여부를 변경하거나 새로운 항목을 추가할 수 있습니다. 이름·출석번호는 출결 처리에 필요하여 숨길 수 없습니다. 새 항목 데이터는 기존 수련생 정보와 별도로 안전하게 보관됩니다.</p><div id="fieldEditor"></div><button type="button" class="small-btn" onclick="addCustomField()">＋ 새 항목 추가</button><button type="button" class="primary" style="margin-top:12px" onclick="saveStudentFields()">항목 설정 저장</button><div id="fieldSettingsMessage" class="message"></div></section>
 <section class="card" id="adminSecurityCard">
 <h2>🔐 관리자 보안 설정</h2>
-<p class="settings-note">최초 등록은 현재 관리자 비밀번호로 확인한 후 진행합니다. 이후에는 현재 비밀번호를 입력하여 변경할 수 있습니다. 새 비밀번호는 8자 이상으로 설정하세요.</p>
+<p class="settings-note">최초 등록은 현재 관리자 비밀번호로 확인한 후 진행합니다. 이후에는 현재 비밀번호를 입력하여 변경할 수 있습니다. 새 비밀번호는 4자 이상으로 설정하세요.</p>
 <div id="adminSecurityStatus" class="security-status">먼저 등록 상태 확인을 누른 다음, 현재 비밀번호와 새 비밀번호를 입력해 주세요.</div>
 <button type="button" class="small-btn" onclick="checkAdminSecurityStatus()">등록 상태 확인</button>
 <div class="security-grid" style="margin-top:16px">
 <div class="field full"><label for="securityCurrent">현재 관리자 비밀번호</label><input id="securityCurrent" type="password" autocomplete="current-password" placeholder="현재 사용 중인 비밀번호"></div>
-<div class="field"><label for="securityNew">새 관리자 비밀번호 (8자 이상)</label><input id="securityNew" type="password" autocomplete="new-password" placeholder="새 비밀번호"></div>
+<div class="field"><label for="securityNew">새 관리자 비밀번호 (4자 이상)</label><input id="securityNew" type="password" autocomplete="new-password" placeholder="새 비밀번호"></div>
 <div class="field"><label for="securityConfirm">새 비밀번호 확인</label><input id="securityConfirm" type="password" autocomplete="new-password" placeholder="새 비밀번호 다시 입력"></div>
 <div class="full"><button type="button" class="primary" id="securitySaveBtn" onclick="saveAdminSecurityPassword()">비밀번호 등록 / 변경</button></div>
 </div>
@@ -429,29 +397,6 @@ onkeydown="if(event.key==='Enter') login()">
 
 
 </div>
-<div id="pageHistory" class="admin-page" hidden>
-<section class="card">
-<h2>📆 전체 출석 기록</h2>
-<p class="settings-note">기간별 출석·귀가 기록을 확인하고, 수련생을 선택하면 학부모 화면처럼 개인별 출석 달력을 볼 수 있습니다. 기존 기록은 수정하지 않습니다.</p>
-<div class="history-controls">
-<div class="field"><label>시작일</label><input id="historyFrom" type="date"></div>
-<div class="field"><label>종료일</label><input id="historyTo" type="date"></div>
-<div class="field"><label>수련생</label><select id="historyStudent"><option value="">전체 수련생</option></select></div>
-<div class="field"><label>수련반</label><select id="historyClass"><option value="">전체 수련반</option></select></div>
-</div>
-<div class="history-buttons"><button type="button" class="primary" onclick="loadHistory()">🔎 기록 조회</button><button type="button" class="small-btn" onclick="downloadHistoryCsv()">📥 조회 결과 CSV</button></div>
-<div id="historyMessage" class="message" role="status"></div>
-<section class="daily-board" aria-label="날짜별 수련생 출석 현황">
- <div class="daily-board-head"><div><h3>📋 날짜별 출석 현황</h3><p>초록: 출석 · 파랑: 귀가 완료 · 회색: 출석 기록 없음 (결석 확정 아님)</p></div>
- <div class="field"><label for="dailyBoardDate">확인할 날짜</label><input id="dailyBoardDate" type="date" onchange="renderDailyBoard()"></div></div>
- <div id="dailyBoardSummary" class="daily-board-summary"></div>
- <div id="dailyBoardGrid" class="daily-board-grid"><div class="daily-board-empty">기록 조회 버튼을 누르면 수련생별 현황이 나타납니다.</div></div>
-</section>
-<div id="historyStats" class="history-stats"></div>
-<div id="historyCalendar" class="history-calendar" hidden></div>
-<div class="history-scroll"><table class="history-table"><thead><tr><th>날짜</th><th>이름</th><th>수련반</th><th>출석</th><th>귀가</th></tr></thead><tbody id="historyRows"><tr><td colspan="5">조회 버튼을 눌러주세요.</td></tr></tbody></table></div>
-</section>
-</div>
 <div id="pageStudents" class="admin-page" hidden>
 <!-- 수련생 등록 -->
 <div class="card">
@@ -501,7 +446,7 @@ onkeydown="if(event.key==='Enter') login()">
 </div>
 
 <div class="field full">
-<div id="addCustomFields" class="full" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px"></div><button class="primary" id="addBtn" onclick="addStudent()">수련생 등록</button>
+<button class="primary" id="addBtn" onclick="addStudent()">수련생 등록</button>
 </div>
 
 </div>
@@ -604,7 +549,7 @@ oninput="renderStudents()">
 
 </div>
 
-<div id="editCustomFields" class="form-grid" style="margin-top:14px"></div><div class="modal-buttons">
+<div class="modal-buttons">
 <button class="cancel" onclick="closeEdit()">취소</button>
 <button class="primary" id="saveEditBtn" onclick="saveEdit()">수정 저장</button>
 </div>
@@ -735,7 +680,6 @@ message.textContent="";
 
 startAutoRefresh();
 loadDojoSettings();
- loadStudentFieldSettings();
 
 }catch(error){
 
@@ -814,7 +758,6 @@ rpc("admin_today_departures",{admin_password:adminPassword}).catch(error=>{conso
 ]);
 
 students=Array.isArray(results[0])?results[0]:[];
- await loadStudentCustomValues();
 todayAttendance=Array.isArray(results[1])?results[1]:[];
 mergeDepartures(results[2]);
 
@@ -1342,7 +1285,6 @@ return;
 
 message.className="message success";
 message.textContent=name+" 수련생 등록 완료! (출석번호 "+pin+")";
-try{const newStudent=students.find(x=>String(x.pin)===pin); await loadAll();const registered=students.find(x=>String(x.pin)===pin);if(registered)await saveStudentCustomValues(registered.id,"addCustomFields");}catch(e){console.warn("추가 항목 저장 실패",e);message.textContent+=" · 추가 항목 저장을 확인해주세요.";}
 
 [
 "name","pin","phone","birthDate",
@@ -1445,7 +1387,6 @@ info.appendChild(main);
 
 const sub=[s.class_name,s.school,s.grade,s.belt].filter(Boolean).join(" · ");
 if(sub)info.appendChild(el("div","student-sub",sub));
-const extraText=studentFieldsForDisplay().map(f=>customStudentValues[String(s.id)]?.[f.id]?f.label+": "+customStudentValues[String(s.id)][f.id]:"").filter(Boolean).join(" · ");if(extraText)info.appendChild(el("div","student-sub",extraText));
 
 
 const buttons=el("div","buttons");
@@ -1503,7 +1444,6 @@ document.getElementById("editGrade").value=s.grade||"";
 document.getElementById("editBelt").value=s.belt||"";
 document.getElementById("editStatus").value=s.status||"재원";
 
-renderStudentValueInputs("editCustomFields",s);
 document.getElementById("editMessage").textContent="";
 document.getElementById("editModal").style.display="flex";
 
@@ -1578,7 +1518,6 @@ return;
 
 }
 
-try{await saveStudentCustomValues(editingStudent.id,"editCustomFields");}catch(e){console.error(e);toast("기본 정보는 저장됐지만 추가 항목 저장에 실패했습니다.");return;}
 toast(name+" 정보를 저장했습니다.");
 closeEdit();
 await loadAll();
@@ -1661,7 +1600,7 @@ async function saveAdminSecurityPassword(){
  if(adminSecurityRegistered===null){msg.className="message error";msg.textContent="먼저 비밀번호 등록 상태를 확인해 주세요.";return;}
  if(!window.DOJO_AUTH_MIGRATION_COMPLETE){msg.className="message error";msg.textContent="안전 보호: 도장 설정 저장 등 남은 서버 함수의 새 비밀번호 호환성을 확인한 후 등록할 수 있습니다.";return;}
  if(!current){msg.className="message error";msg.textContent="현재 비밀번호를 입력해주세요.";return;}
- if(next.length<8 || new TextEncoder().encode(next).length>72){msg.className="message error";msg.textContent="새 비밀번호는 8자 이상, UTF-8 기준 72바이트 이하로 입력해 주세요.";return;}
+ if(next.length<4 || new TextEncoder().encode(next).length>72){msg.className="message error";msg.textContent="새 비밀번호는 4자 이상, UTF-8 기준 72바이트 이하로 입력해 주세요.";return;}
  if(next!==confirmPw){msg.className="message error";msg.textContent="새 비밀번호 확인이 일치하지 않습니다.";return;}
  if(!confirm("새 관리자 비밀번호로 변경하시겠습니까? 변경 후 기존 비밀번호는 사용할 수 없습니다."))return;
  const btn=document.getElementById("securitySaveBtn");btn.disabled=true;
@@ -1698,11 +1637,10 @@ function applyDojoTheme(d){
  document.documentElement.style.setProperty("--dojo-primary",safeHex(d.primary_color,dojoDefaults.primary_color));
 }
 function openAdminPage(page){
- const ids={home:"adminHome",attendance:"pageAttendance",history:"pageHistory",students:"pageStudents",birthday:"pageBirthday",program:"pageProgram",links:"pageLinks"};
+ const ids={home:"adminHome",attendance:"pageAttendance",students:"pageStudents",birthday:"pageBirthday",program:"pageProgram",links:"pageLinks"};
  if(!ids[page])page="home";
  for(const [key,id] of Object.entries(ids))document.getElementById(id).hidden=key!==page;
  document.querySelectorAll(".manage-nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===page));
- if(page==="history"){prepareHistoryFilters();if(!historyLoaded)loadHistory();}
  window.scrollTo({top:0,behavior:"instant"});
 }
 function fillDojoForm(d){
@@ -1781,191 +1719,9 @@ document.querySelectorAll("#dojoSettingsCard input").forEach(x=>x.addEventListen
 buildAddressRows();
 openAdminPage("home");
 
-
-/* 화면 항목 설정 */
-const uiDefaults = {"kiosk_title": "출석체크", "kiosk_guide": "출석번호 4자리를 입력해주세요", "kiosk_bg": "#f4f7fb", "parent_subtitle": "학부모 출석확인 · 전체 기록", "parent_guide": "자녀의 출석번호 4자리를 입력해 주세요.", "parent_bg": "#f3f6fb", "push_attendance": "출석했습니다.", "push_departure": "귀가했습니다.", "app_name": "승리태권도"};
-async function loadUiSettings(){
- try{const raw=await rpc('get_dojo_ui_settings',{});const data=typeof raw==='object'&&raw&&!Array.isArray(raw)?raw:{};
- for(const [key,value] of Object.entries(uiDefaults)){const field=document.getElementById('ui_'+key);if(field)field.value=typeof data[key]==='string'?data[key]:value;}}
- catch(e){console.warn('화면 설정을 불러오지 못했습니다.',e);}
-}
-async function saveUiSettings(){
- const msg=document.getElementById('uiSaveMessage'),btn=document.getElementById('uiSaveBtn');
- const data={};for(const key of Object.keys(uiDefaults))data[key]=document.getElementById('ui_'+key).value.trim();
- btn.disabled=true;msg.textContent='저장 중...';msg.className='message';
- try{const result=await rpc('admin_save_dojo_ui_settings',{admin_password:adminPassword,new_settings:data});
- if(!result?.success)throw Error(result?.message||'저장 실패');msg.textContent='저장되었습니다. 출석체크기와 학부모 화면을 새로고침해 확인하세요.';msg.className='message success';}
- catch(e){console.error(e);msg.textContent='저장 실패: SQL 설치 및 관리자 인증을 확인해 주세요.';msg.className='message error';}
- finally{btn.disabled=false;}
-}
-loadUiSettings();
-
-
-/* 수련생 항목 사용자 정의: 기본 필드 라벨/표시, 별도 추가 필드 */
-const studentBaseFields=[
- {key:'name',label:'이름',locked:true},{key:'pin',label:'출석번호',locked:true},
- {key:'phone',label:'학부모 연락처'},{key:'birthDate',label:'생년월일'},
- {key:'className',label:'수련반'},{key:'school',label:'학교'},
- {key:'grade',label:'학년'},{key:'belt',label:'띠'}
-];
-let studentFieldConfig={base:{},extra:[]};
-let customStudentValues={};
-function safeFieldLabel(v){return String(v||'').trim().slice(0,45)}
-function studentFieldsForDisplay(){return studentFieldConfig.extra.filter(x=>x.id&&x.label&&!x.hidden)}
-function fieldControl(label,type,value,onchange){const box=document.createElement('div');box.className='field';const l=document.createElement('label');l.textContent=label;const inp=document.createElement('input');inp.type=type;inp.value=value||'';inp.addEventListener('input',()=>onchange(inp.value));box.append(l,inp);return box;}
-function renderFieldEditor(){
- const box=document.getElementById('fieldEditor');if(!box)return;box.replaceChildren();
- const h=document.createElement('h3');h.textContent='기본 항목';box.append(h);
- studentBaseFields.forEach(f=>{
-  const conf=studentFieldConfig.base[f.key]||{};
-  const row=document.createElement('div');row.style.cssText='display:flex;gap:10px;align-items:center;margin:8px 0';
-  const input=document.createElement('input');input.value=conf.label||f.label;input.setAttribute('aria-label',f.label+' 표시 이름');input.oninput=()=>{studentFieldConfig.base[f.key]={...studentFieldConfig.base[f.key],label:input.value};applyStudentFieldConfig()};
-  const label=document.createElement('label');label.style.cssText='display:flex;align-items:center;gap:4px;white-space:nowrap;font-size:13px';
-  const check=document.createElement('input');check.type='checkbox';check.style.width='auto';check.checked=f.locked?true:!conf.hidden;check.disabled=!!f.locked;
-  check.onchange=()=>{studentFieldConfig.base[f.key]={...studentFieldConfig.base[f.key],hidden:!check.checked};applyStudentFieldConfig()};
-  label.append(check,document.createTextNode(f.locked?'필수':'표시'));row.append(input,label);box.append(row);
- });
- const h2=document.createElement('h3');h2.textContent='추가 항목';h2.style.marginTop='22px';box.append(h2);
- studentFieldConfig.extra.forEach((f,i)=>{
-  const row=document.createElement('div');row.style.cssText='display:flex;gap:8px;align-items:center;margin:8px 0';
-  const inp=document.createElement('input');inp.value=f.label;inp.placeholder='항목 이름 (예: 차량 노선)';inp.oninput=()=>{f.label=inp.value;applyStudentFieldConfig()};
-  const label=document.createElement('label');label.style.cssText='display:flex;gap:4px;align-items:center;white-space:nowrap;font-size:13px';
-  const chk=document.createElement('input');chk.type='checkbox';chk.style.width='auto';chk.checked=!f.hidden;chk.onchange=()=>{f.hidden=!chk.checked;applyStudentFieldConfig()};label.append(chk,document.createTextNode('표시'));
-  const del=document.createElement('button');del.type='button';del.className='delete';del.textContent='삭제';del.onclick=()=>{if(confirm('이 항목을 숨기지 않고 삭제하시겠습니까? 저장된 값은 복구하기 어려울 수 있습니다.')){studentFieldConfig.extra.splice(i,1);renderFieldEditor();applyStudentFieldConfig()}};
-  row.append(inp,label,del);box.append(row);
- });
-}
-function addCustomField(){studentFieldConfig.extra.push({id:'custom_'+crypto.randomUUID().replace(/-/g,'').slice(0,16),label:'새 항목',hidden:false});renderFieldEditor();applyStudentFieldConfig()}
-function applyStudentFieldConfig(){
- for(const f of studentBaseFields){const c=studentFieldConfig.base[f.key]||{};for(const id of [f.key,'edit'+f.key.charAt(0).toUpperCase()+f.key.slice(1)]){
-  const input=document.getElementById(id);if(!input)continue;const wrapper=input.closest('.field');if(!wrapper)continue;
-  const label=wrapper.querySelector('label');if(label)label.textContent=(c.label||f.label)+(f.locked?' *':'');
-  wrapper.style.display=c.hidden&&!f.locked?'none':'';
- }}
- renderStudentValueInputs('addCustomFields');if(editingStudent)renderStudentValueInputs('editCustomFields',editingStudent);
- renderStudents();
-}
-function renderStudentValueInputs(targetId,student){
- const box=document.getElementById(targetId);if(!box)return;
- const previous={};box.querySelectorAll('[data-extra-id]').forEach(x=>previous[x.dataset.extraId]=x.value);
- box.replaceChildren();for(const f of studentFieldsForDisplay()){
-  const wrapper=document.createElement('div');wrapper.className='field';const label=document.createElement('label');label.textContent=f.label;
-  const input=document.createElement('input');input.dataset.extraId=f.id;input.maxLength=500;input.value=previous[f.id]??(student?customStudentValues[String(student.id)]?.[f.id]:'')??'';
-  wrapper.append(label,input);box.append(wrapper);
- }
-}
-async function loadStudentFieldSettings(){
- try{const data=await rpc('get_student_field_settings',{});studentFieldConfig={base:data?.base||{},extra:Array.isArray(data?.extra)?data.extra:[]};renderFieldEditor();applyStudentFieldConfig();}
- catch(e){console.warn('수련생 항목 설정 조회 실패',e);}
-}
-async function saveStudentFields(){
- const msg=document.getElementById('fieldSettingsMessage');msg.textContent='저장 중...';msg.className='message';
- try{const labels=studentFieldConfig.extra.map(x=>safeFieldLabel(x.label));if(labels.some(x=>!x))throw Error('추가 항목 이름을 입력해 주세요.');
- const r=await rpc('admin_save_student_field_settings',{admin_password:adminPassword,new_settings:studentFieldConfig});if(!r?.success)throw Error(r?.message||'저장 실패');
- msg.textContent='항목 설정을 저장했습니다.';msg.className='message success';renderFieldEditor();applyStudentFieldConfig();}
- catch(e){msg.textContent='저장 실패: '+e.message;msg.className='message error';}
-}
-async function loadStudentCustomValues(){
- try{const r=await rpc('admin_get_student_extra_values',{admin_password:adminPassword});if(r?.success)customStudentValues=r.values||{};}
- catch(e){console.warn('추가 항목 조회 실패',e);}
-}
-async function saveStudentCustomValues(studentId,containerId){
- const box=document.getElementById(containerId);if(!box)return;
- const values={...(customStudentValues[String(studentId)]||{})};
- box.querySelectorAll('[data-extra-id]').forEach(x=>values[x.dataset.extraId]=x.value.trim());
- const r=await rpc('admin_save_student_extra',{admin_password:adminPassword,p_student_id:String(studentId),p_values:values});
- if(!r?.success)throw Error(r?.message||'추가 항목 저장 실패');customStudentValues[String(studentId)]=values;
-}
-
 /* 새로고침해도 로그인 유지 */
 const savedPw=store("get");
 if(savedPw)login(savedPw);
-
-
-/* 관리자 전체 출석 기록 / 개인별 달력 */
-let historyData=[];
-let historyMonth=null;
-let historyLoaded=false;
-function historyLocalDate(d){const f=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'});return f.format(d)}
-function historyTime(v){if(!v)return '-';const d=new Date(v);return isNaN(d.getTime())?'-':d.toLocaleTimeString('ko-KR',{timeZone:'Asia/Seoul',hour:'2-digit',minute:'2-digit'})}
-function prepareHistoryFilters(){
- const from=document.getElementById('historyFrom'),to=document.getElementById('historyTo');
- if(!to.value){const now=new Date();to.value=historyLocalDate(now);from.value=to.value.slice(0,8)+'01'}
- const bd=document.getElementById('dailyBoardDate');if(!bd.value)bd.value=historyLocalDate(new Date());
- const st=document.getElementById('historyStudent'),cls=document.getElementById('historyClass');
- const selected=st.value,selectedClass=cls.value;
- st.replaceChildren(new Option('전체 수련생',''));
- [...students].sort((a,b)=>String(a.name||'').localeCompare(String(b.name||''),'ko')).forEach(x=>st.add(new Option(`${x.name} (${x.pin||'-'})`,String(x.id))));
- if([...st.options].some(o=>o.value===selected))st.value=selected;
- cls.replaceChildren(new Option('전체 수련반',''));
- [...new Set(students.map(s=>s.class_name).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'ko')).forEach(x=>cls.add(new Option(x,x)));
- if([...cls.options].some(o=>o.value===selectedClass))cls.value=selectedClass;
-}
-async function loadHistory(){
- const msg=document.getElementById('historyMessage'),from=document.getElementById('historyFrom').value,to=document.getElementById('historyTo').value;
- if(!from||!to||from>to){msg.textContent='시작일과 종료일을 확인해주세요.';return}
- const days=(Date.parse(to+'T00:00:00Z')-Date.parse(from+'T00:00:00Z'))/86400000;
- if(days>366){msg.textContent='한 번에 최대 367일까지만 조회할 수 있습니다.';return}
- msg.textContent='기록을 조회하고 있습니다...';historyLoaded=false;
- try{
- const sid=document.getElementById('historyStudent').value;
- const res=await rpc('admin_attendance_overview',{admin_password:adminPassword,date_from:from,date_to:to,filter_student_id:sid?Number(sid):null});
- if(!res||res.success!==true)throw Error(res?.message||'조회 실패');
- historyData=Array.isArray(res.records)?res.records:[];historyLoaded=true;
- historyMonth=from.slice(0,7);
- msg.textContent=`${historyData.length}건 조회되었습니다.`;
- renderHistory();
- }catch(e){console.error(e);msg.textContent='조회 실패: '+(e.message||'서버 함수를 확인해주세요.');historyData=[];renderHistory()}
-}
-function historyFiltered(){const cl=document.getElementById('historyClass').value;return historyData.filter(r=>!cl||r.class_name===cl)}
-function renderHistory(){
- const rows=historyFiltered(),stats=document.getElementById('historyStats'),tbody=document.getElementById('historyRows');stats.replaceChildren();tbody.replaceChildren();
- const unique=new Set(rows.map(r=>String(r.student_id)));
- for(const t of [`출석 ${rows.length}건`,`수련생 ${unique.size}명`,`귀가 완료 ${rows.filter(r=>r.departed_at).length}건`])stats.appendChild(Object.assign(document.createElement('span'),{textContent:t}));
- if(!rows.length){const tr=document.createElement('tr'),td=document.createElement('td');td.colSpan=5;td.textContent='해당 기간에 출석 기록이 없습니다.';tr.appendChild(td);tbody.appendChild(tr)}
- for(const r of rows){const tr=document.createElement('tr');for(const val of [r.attendance_date,r.name,r.class_name||'-',historyTime(r.checked_at),historyTime(r.departed_at)]){const td=document.createElement('td');td.textContent=val;tr.appendChild(td)}tbody.appendChild(tr)}
- const cal=document.getElementById('historyCalendar');cal.hidden=!document.getElementById('historyStudent').value;
- if(!cal.hidden)renderHistoryCalendar();
- renderDailyBoard();
-}
-
-function renderDailyBoard(){
- const grid=document.getElementById('dailyBoardGrid'),summary=document.getElementById('dailyBoardSummary');
- if(!grid||!summary)return;
- grid.replaceChildren();summary.replaceChildren();
- const day=document.getElementById('dailyBoardDate').value;
- const from=document.getElementById('historyFrom').value,to=document.getElementById('historyTo').value;
- if(!historyLoaded){grid.textContent='기록을 먼저 조회해주세요.';return}
- if(!day||day<from||day>to){grid.textContent='선택한 날짜가 조회 기간 밖입니다. 시작일·종료일을 변경한 뒤 기록 조회를 눌러주세요.';return}
- const cl=document.getElementById('historyClass').value;
- const sid=document.getElementById('historyStudent').value;
- const active=students.filter(x=>(!x.status||x.status==='재원')&&(!cl||x.class_name===cl)&&(!sid||String(x.id)===sid));
- active.sort((a,b)=>String(a.name||'').localeCompare(String(b.name||''),'ko'));
- const records=new Map(historyData.filter(r=>r.attendance_date===day).map(r=>[String(r.student_id),r]));
- let present=0,departed=0;
- for(const st of active){
-  const r=records.get(String(st.id));if(r){present++;if(r.departed_at)departed++}
-  const tile=document.createElement('div');tile.className='daily-board-tile'+(r?(r.departed_at?' departed':' present'):'');
-  const name=document.createElement('strong');name.textContent=st.name||'이름 없음';tile.appendChild(name);
-  const cls=document.createElement('small');cls.textContent=st.class_name||'수련반 미지정';tile.appendChild(cls);
-  const status=document.createElement('span');status.className='daily-status';
-  status.textContent=r?(r.departed_at?'귀가 완료 · '+historyTime(r.departed_at):'출석 · '+historyTime(r.checked_at)):'출석 기록 없음';tile.appendChild(status);grid.appendChild(tile);
- }
- for(const v of ['전체 '+active.length+'명','출석 '+present+'명','출석 기록 없음 '+(active.length-present)+'명','귀가 완료 '+departed+'명']){
-  const badge=document.createElement('span');badge.textContent=v;summary.appendChild(badge);
- }
- if(!active.length){grid.textContent='표시할 재원 수련생이 없습니다.'}
-}
-
-function moveHistoryMonth(delta){const [y,m]=historyMonth.split('-').map(Number);const d=new Date(y,m-1+delta,1);const key=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');const from=document.getElementById('historyFrom').value.slice(0,7),to=document.getElementById('historyTo').value.slice(0,7);if(key<from||key>to)return;historyMonth=key;renderHistoryCalendar()}
-function renderHistoryCalendar(){
- const cal=document.getElementById('historyCalendar');cal.replaceChildren();const sid=document.getElementById('historyStudent').value;if(!sid)return;
- const [y,m]=historyMonth.split('-').map(Number);const head=document.createElement('div');head.className='history-cal-head';const prev=document.createElement('button'),next=document.createElement('button'),title=document.createElement('strong');prev.className=next.className='small-btn';prev.textContent='◀ 이전 달';next.textContent='다음 달 ▶';title.textContent=`${y}년 ${m}월`;prev.onclick=()=>moveHistoryMonth(-1);next.onclick=()=>moveHistoryMonth(1);prev.disabled=historyMonth<=document.getElementById('historyFrom').value.slice(0,7);next.disabled=historyMonth>=document.getElementById('historyTo').value.slice(0,7);head.append(prev,title,next);cal.appendChild(head);
- const grid=document.createElement('div');grid.className='history-calendar-grid';for(const w of ['일','월','화','수','목','금','토'])grid.appendChild(Object.assign(document.createElement('div'),{textContent:w}));
- const records=new Map(historyData.filter(r=>String(r.student_id)===sid).map(r=>[r.attendance_date,r]));const first=new Date(y,m-1,1),count=new Date(y,m,0).getDate();for(let i=0;i<first.getDay();i++){const d=document.createElement('div');d.className='history-day empty';grid.appendChild(d)}
- for(let day=1;day<=count;day++){const key=historyMonth+'-'+String(day).padStart(2,'0'),r=records.get(key),cell=document.createElement('div');cell.className='history-day'+(r?' yes':'');cell.textContent=day;if(r){const info=document.createElement('small');info.textContent='✓ '+historyTime(r.checked_at);cell.appendChild(info);if(r.departed_at){const dep=document.createElement('small');dep.textContent='🏠 '+historyTime(r.departed_at);cell.appendChild(dep)}}grid.appendChild(cell)}cal.appendChild(grid);
-}
-function downloadHistoryCsv(){if(!historyLoaded){alert('먼저 기록을 조회해주세요.');return}const records=historyFiltered(),cols=[['날짜','attendance_date'],['이름','name'],['수련반','class_name'],['출석시간','checked_at'],['귀가시간','departed_at']];const quote=x=>'"'+String(x??'').replace(/"/g,'""')+'"';const lines=[cols.map(x=>quote(x[0])).join(',')];for(const r of records)lines.push([r.attendance_date,r.name,r.class_name||'',historyTime(r.checked_at),historyTime(r.departed_at)].map(quote).join(','));const blob=new Blob(['\ufeff'+lines.join('\r\n')],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='출석기록_'+document.getElementById('historyFrom').value+'_'+document.getElementById('historyTo').value+'.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
 
 </script>
 
