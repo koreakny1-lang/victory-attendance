@@ -549,6 +549,8 @@ onkeydown="if(event.key==='Enter') login()">
 <input id="belt" placeholder="예: 빨강띠">
 </div>
 
+<div id="customAddFields" class="form-grid" style="display:contents"></div>
+
 <div class="field full">
 <button class="primary" id="addBtn" onclick="addStudent()">수련생 등록</button>
 </div>
@@ -556,8 +558,6 @@ onkeydown="if(event.key==='Enter') login()">
 </div>
 
 <datalist id="classList"></datalist>
-
-<div id="customAddFields" class="form-grid" style="margin-top:15px"></div>
 <div id="addMessage" class="message"></div>
 
 </div>
@@ -652,9 +652,9 @@ oninput="renderStudents()">
 </select>
 </div>
 
+<div id="customEditFields" class="form-grid" style="display:contents"></div>
 </div>
 
-<div id="customEditFields" class="form-grid" style="margin:14px 0"></div>
 <div class="modal-buttons">
 <button class="cancel" onclick="closeEdit()">취소</button>
 <button class="primary" id="saveEditBtn" onclick="saveEdit()">수정 저장</button>
@@ -1962,7 +1962,11 @@ function applyBaseFieldSettings(){
    const field=document.getElementById(id)?.closest('.field');
    if(field&&field.parentElement===grid)grid.appendChild(field);
   }
-  if(buttonRow&&buttonRow.parentElement===grid)grid.appendChild(buttonRow);
+  if(buttonRow&&buttonRow.parentElement===grid){
+   const custom=document.getElementById('customAddFields');
+   if(custom&&custom.parentElement===grid)grid.appendChild(custom);
+   grid.appendChild(buttonRow);
+  }
  }
 }
 
