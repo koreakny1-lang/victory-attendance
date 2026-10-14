@@ -1848,7 +1848,7 @@ async function saveStudentCustomValues(studentId,containerId){
  const box=document.getElementById(containerId);if(!box)return;
  const values={...(customStudentValues[String(studentId)]||{})};
  box.querySelectorAll('[data-extra-id]').forEach(x=>values[x.dataset.extraId]=x.value.trim());
- const r=await rpc('admin_save_student_extra_values',{admin_password:adminPassword,p_student_id:String(studentId),new_values:values});
+ const r=await rpc('admin_save_student_extra',{admin_password:adminPassword,p_student_id:String(studentId),p_values:values});
  if(!r?.success)throw Error(r?.message||'추가 항목 저장 실패');customStudentValues[String(studentId)]=values;
 }
 
