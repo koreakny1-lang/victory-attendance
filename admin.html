@@ -232,6 +232,17 @@ header h1{color:#fff}
 .security-grid .full{grid-column:1/-1}
 .security-status{border-radius:10px;background:#f0f5ff;padding:12px;margin:12px 0;color:#24456c;font-size:14px}
 @media(max-width:650px){.security-grid{grid-template-columns:1fr}}
+
+/* 사범님 터치 출석체크 */
+.manual-toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:16px}
+.manual-toolbar select,.manual-toolbar input{padding:12px;border:1px solid #d6dfe9;border-radius:10px;font-size:16px;max-width:100%}
+.manual-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(125px,1fr));gap:11px}
+.manual-student{min-height:92px;padding:12px 7px;border:2px solid #d5dce6;border-radius:15px;background:#fff;color:#223047;display:flex;flex-direction:column;justify-content:center;gap:7px;align-items:center;font-size:18px;font-weight:800;cursor:pointer}
+.manual-student.present{background:#e4f8eb;border-color:#26a85e;color:#126536}
+.manual-student:disabled{opacity:.55;cursor:wait}
+.manual-student small{font-size:12px;font-weight:600}
+.manual-summary{font-weight:800;margin:12px 0 16px}
+@media(max-width:500px){.manual-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}.manual-student{font-size:15px;min-height:80px}}
 </style>
 </head>
 
@@ -273,6 +284,7 @@ onkeydown="if(event.key==='Enter') login()">
 
 <nav class="manage-nav" aria-label="관리자 메뉴">
 <button type="button" data-page="home" onclick="openAdminPage('home')">🏠 홈</button>
+<button type="button" data-page="manual" onclick="openAdminPage('manual')">✅ 터치 출석</button>
 <button type="button" data-page="attendance" onclick="openAdminPage('attendance')">📋 출결 관리</button>
 <button type="button" data-page="students" onclick="openAdminPage('students')">👨‍🎓 수련생 관리</button>
 <button type="button" data-page="birthday" onclick="openAdminPage('birthday')">🎂 생일 관리</button>
@@ -284,6 +296,7 @@ onkeydown="if(event.key==='Enter') login()">
 <h2>관리자 홈</h2>
 <p class="settings-note">필요한 메뉴를 선택하면 해당 관리 화면으로 이동합니다.</p>
 <div class="home-grid">
+<button onclick="openAdminPage('manual')">✅<strong>터치 출석</strong><span>이름을 눌러 출석체크</span></button>
 <button onclick="openAdminPage('attendance')">📋<strong>출결 관리</strong><span>출석·미출석 확인 및 처리</span></button>
 <button onclick="openAdminPage('students')">👨‍🎓<strong>수련생 관리</strong><span>등록·수정·명단 관리</span></button>
 <button onclick="openAdminPage('birthday')">🎂<strong>생일 관리</strong><span>이번 달 생일 확인</span></button>
@@ -329,6 +342,20 @@ onkeydown="if(event.key==='Enter') login()">
 <div id="addressRows"></div>
 </section>
 
+</div>
+<div id="pageManual" class="admin-page" hidden>
+<section class="card">
+<h2>✅ 사범님 터치 출석체크</h2>
+<p class="settings-note">학생 이름을 누르면 오늘 출석이 저장됩니다. 직접 체크한 출석은 학부모에게 알림을 보내지 않습니다. 초록색은 출석 완료입니다.</p>
+<div class="manual-toolbar">
+<label>수련반 <select id="manualClass" onchange="renderManualAttendance()"><option value="">전체 수련반</option></select></label>
+<input id="manualSearch" type="search" placeholder="학생 이름 검색" oninput="renderManualAttendance()" aria-label="학생 이름 검색">
+<button type="button" class="refresh" onclick="refreshManualAttendance()">🔄 새로고침</button>
+</div>
+<div id="manualSummary" class="manual-summary">출석 현황을 불러오는 중...</div>
+<div id="manualMessage" class="message" role="status"></div>
+<div id="manualGrid" class="manual-grid"></div>
+</section>
 </div>
 <div id="pageAttendance" class="admin-page" hidden>
 <div class="dashboard">
@@ -767,6 +794,7 @@ renderAbsent();
 updateDashboard();
 renderBirthdays();
 fillClassList();
+renderManualAttendance();
 
 }catch(error){
 
@@ -796,6 +824,7 @@ async function loadTodayAttendance(){
   todayAttendance=Array.isArray(results[0])?results[0]:[];
   mergeDepartures(results[1]);
   renderTodayAttendance();
+  renderManualAttendance();
 }
 
 
@@ -1636,11 +1665,58 @@ function applyDojoTheme(d){
  document.title=name+" 관리자";
  document.documentElement.style.setProperty("--dojo-primary",safeHex(d.primary_color,dojoDefaults.primary_color));
 }
+
+/* 터치 출석: 기존 출석번호 입력 함수와 별개이며 푸시 호출 없음 */
+let manualBusy=false;
+function renderManualAttendance(){
+ const grid=document.getElementById("manualGrid");if(!grid)return;
+ const cls=document.getElementById("manualClass");
+ const classes=[...new Set(activeStudents().map(s=>String(s.class_name||"").trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"ko"));
+ const prev=cls.value;
+ cls.replaceChildren(new Option("전체 수련반",""),...classes.map(c=>new Option(c,c)));
+ cls.value=classes.includes(prev)?prev:"";
+ const query=document.getElementById("manualSearch").value.trim().toLowerCase();
+ const visible=activeStudents().filter(s=>(!cls.value||String(s.class_name||"").trim()===cls.value)&&(!query||String(s.name||"").toLowerCase().includes(query))).sort((a,b)=>String(a.name).localeCompare(String(b.name),"ko"));
+ const present=attendedPins();
+ document.getElementById("manualSummary").textContent=`표시 ${visible.length}명 · 출석 ${visible.filter(s=>present.has(String(s.pin))).length}명 · 미출석 ${visible.filter(s=>!present.has(String(s.pin))).length}명`;
+ grid.replaceChildren();
+ for(const s of visible){
+  const checked=present.has(String(s.pin));
+  const btn=document.createElement("button");btn.type="button";
+  btn.className="manual-student"+(checked?" present":"");
+  btn.disabled=manualBusy;
+  const name=document.createElement("span");name.textContent=s.name;
+  const state=document.createElement("small");state.textContent=checked?"● 출석 완료":"○ 미출석";
+  btn.append(name,state);
+  btn.onclick=()=>markManualStudent(s,checked);
+  grid.append(btn);
+ }
+}
+async function refreshManualAttendance(){
+ if(manualBusy||!adminPassword)return;
+ try{await loadTodayAttendance();renderManualAttendance();}
+ catch(e){console.error(e);document.getElementById("manualMessage").textContent="출석 현황 새로고침에 실패했습니다.";}
+}
+async function markManualStudent(s,wasPresent){
+ if(manualBusy)return;
+ if(wasPresent&&!confirm(s.name+" 수련생의 오늘 출석을 취소하시겠습니까?\n귀가 완료 기록은 취소할 수 없습니다."))return;
+ manualBusy=true;renderManualAttendance();
+ const msg=document.getElementById("manualMessage");msg.className="message";msg.textContent="처리 중...";
+ try{
+  const result=await rpc("admin_manual_attendance",{admin_password:adminPassword,target_student_id:Number(s.id),mark_present:!wasPresent});
+  if(!result||result.success!==true)throw new Error(result?.message||"처리 실패");
+  msg.className="message";msg.textContent=s.name+" · "+result.message;
+  await loadAll();
+ }catch(e){console.error(e);msg.className="message error";msg.textContent=e.message||"출석 처리 오류";}
+ finally{manualBusy=false;renderManualAttendance();}
+}
+
 function openAdminPage(page){
- const ids={home:"adminHome",attendance:"pageAttendance",students:"pageStudents",birthday:"pageBirthday",program:"pageProgram",links:"pageLinks"};
+ const ids={manual:"pageManual",home:"adminHome",attendance:"pageAttendance",students:"pageStudents",birthday:"pageBirthday",program:"pageProgram",links:"pageLinks"};
  if(!ids[page])page="home";
  for(const [key,id] of Object.entries(ids))document.getElementById(id).hidden=key!==page;
  document.querySelectorAll(".manage-nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===page));
+ if(page==="manual")refreshManualAttendance();
  window.scrollTo({top:0,behavior:"instant"});
 }
 function fillDojoForm(d){
