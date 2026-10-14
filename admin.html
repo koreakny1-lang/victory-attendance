@@ -288,6 +288,23 @@ header h1{color:#fff}
  #pageMonthly .monthly-table .marked{background:#ddd!important;color:#000!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
  #pageMonthly .monthly-table td.weekend-col.marked{background:#cceadf!important;color:#000!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
+
+/* 2026-10-14 관리자 홈·메뉴 디자인 개선 */
+.manage-nav{gap:7px;border-bottom:1px solid #e5eaf2;margin-bottom:23px}
+.manage-nav button{display:inline-flex;align-items:center;justify-content:center;gap:7px;border:1px solid #e2e8f0;border-radius:9px;background:#fff;color:#334155;font-weight:700;box-shadow:none;transition:background .15s,border-color .15s}
+.manage-nav button:hover{background:#f1f5f9;border-color:#cbd5e1}
+.manage-nav button.active{background:var(--dojo-primary,#062b5c);color:white;border-color:var(--dojo-primary,#062b5c)}
+.manage-nav .ui-icon{width:17px;height:17px;flex-shrink:0}
+.home-grid{gap:12px}
+.home-grid button{position:relative;display:grid;grid-template-columns:44px 1fr;grid-template-rows:auto auto;align-content:center;column-gap:14px;min-height:116px;padding:20px;border:1px solid #e2e8f0;border-radius:13px;background:#fff;box-shadow:0 2px 7px #0f172a08;transition:border-color .15s,box-shadow .15s,transform .15s}
+.home-grid button:hover{border-color:#a5b4cc;box-shadow:0 6px 18px #0f172a10;transform:translateY(-1px)}
+.home-grid button:focus-visible,.manage-nav button:focus-visible{outline:3px solid #60a5fa;outline-offset:2px}
+.home-grid .home-icon-box{grid-column:1;grid-row:1/3;display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:12px;background:#eef3fa;color:#244875}
+.home-grid .ui-icon{width:23px;height:23px}
+.home-grid strong{grid-column:2;grid-row:1;font-size:17px;line-height:1.4;margin:0;color:#15263e}
+.home-grid span:not(.home-icon-box){grid-column:2;grid-row:2;font-size:12px;line-height:1.5;margin-top:3px;color:#64748b}
+@media(max-width:650px){.home-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.home-grid button{grid-template-columns:1fr;grid-template-rows:36px auto auto;min-height:140px;padding:14px;gap:5px}.home-grid .home-icon-box{grid-column:1;grid-row:1;width:34px;height:34px;border-radius:9px}.home-grid .ui-icon{width:19px;height:19px}.home-grid strong{grid-column:1;grid-row:2;font-size:15px}.home-grid span:not(.home-icon-box){grid-column:1;grid-row:3;font-size:11px}.manage-nav button{padding:9px 11px}}
+
 </style>
 </head>
 
@@ -335,8 +352,8 @@ onkeydown="if(event.key==='Enter') login()">
 <button type="button" data-page="students" onclick="openAdminPage('students')">👨‍🎓 수련생 관리</button>
 <button type="button" data-page="birthday" onclick="openAdminPage('birthday')">🎂 생일 관리</button>
 
-<button type="button" data-page="links" onclick="openAdminPage('links')">🔗 주소 관리</button>
 <button type="button" data-page="program" onclick="openAdminPage('program')">⚙️ 프로그램 관리</button>
+<button type="button" data-page="links" onclick="openAdminPage('links')">🔗 주소 관리</button>
 </nav>
 <div id="adminHome" class="admin-page">
 <h2>관리자 홈</h2>
@@ -348,8 +365,8 @@ onkeydown="if(event.key==='Enter') login()">
 <button onclick="openAdminPage('students')">👨‍🎓<strong>수련생 관리</strong><span>등록·수정·명단 관리</span></button>
 <button onclick="openAdminPage('birthday')">🎂<strong>생일 관리</strong><span>이번 달 생일 확인</span></button>
 
-<button onclick="openAdminPage('links')">🔗<strong>주소 관리</strong><span>4가지 주소 복사</span></button>
 <button onclick="openAdminPage('program')">⚙️<strong>프로그램 관리</strong><span>도장 설정·수련생 항목 추가/수정</span></button>
+<button onclick="openAdminPage('links')">🔗<strong>주소 관리</strong><span>4가지 주소 복사</span></button>
 </div>
 </div>
 <div id="pageProgram" class="admin-page" hidden>
@@ -2091,6 +2108,26 @@ openAdminPage("home");
 const savedPw=store("get");
 if(savedPw)login(savedPw);
 
+</script>
+
+
+<script>
+/* 관리자 메뉴 아이콘만 일관된 선형 SVG로 교체합니다. 기존 페이지 로직은 변경하지 않습니다. */
+(function(){
+ const paths={
+ home:'<path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/>',
+ monthly:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18M8 14h3M8 18h3"/>',
+ manual:'<rect x="3" y="3" width="18" height="18" rx="4"/><path d="m7 12 3 3 7-7"/>',
+ attendance:'<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4.5h6M9 10h6M9 14h6M9 18h4"/>',
+ students:'<circle cx="9" cy="8" r="3"/><path d="M3 20v-2a6 6 0 0 1 12 0v2M17 8a3 3 0 0 1 0 6M17 17a5 5 0 0 1 4 3"/>',
+ birthday:'<rect x="3" y="11" width="18" height="10" rx="2"/><path d="M3 15h18M8 11V7m4 4V7m4 4V7M8 5v-2m4 2V3m4 2V3"/>',
+ program:'<circle cx="12" cy="12" r="3"/><path d="M10 2h4l.7 2.3 2.1.9 2.1-1.1 2.8 2.8-1.1 2.1.9 2.1L24 12l-2.5 1-.9 2.1 1.1 2.1-2.8 2.8-2.1-1.1-2.1.9L14 22h-4l-.7-2.2-2.1-.9-2.1 1.1-2.8-2.8 1.1-2.1-.9-2.1L0 12l2.5-1 .9-2.1-1.1-2.1 2.8-2.8 2.1 1.1 2.1-.9z" transform="translate(1 1) scale(.92)"/>',
+ links:'<path d="M10 13a5 5 0 0 0 7.1 0l3-3a5 5 0 0 0-7.1-7.1l-1.7 1.7M14 11a5 5 0 0 0-7.1 0l-3 3a5 5 0 0 0 7.1 7.1l1.7-1.7"/>'
+ };
+ const svg=(k)=>'<svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+paths[k]+'</svg>';
+ document.querySelectorAll('.manage-nav button[data-page]').forEach(b=>{const k=b.dataset.page;if(!paths[k])return;b.textContent=b.textContent.replace(/^[^\p{L}\p{N}]+/u,'').trim();b.insertAdjacentHTML('afterbegin',svg(k));});
+ document.querySelectorAll('.home-grid button').forEach(b=>{const m=(b.getAttribute('onclick')||'').match(/openAdminPage\('([^']+)'\)/);if(!m||!paths[m[1]])return;for(const n of Array.from(b.childNodes)){if(n.nodeType===3&&n.textContent.trim())n.remove();}b.insertAdjacentHTML('afterbegin','<span class="home-icon-box">'+svg(m[1])+'</span>');});
+})();
 </script>
 
 </body>
