@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#062b5c">
+<style id="dojoThemeOverrides">:root{--dojo-primary:#062b5c;--dojo-text:#152238}h1{color:var(--dojo-primary)}.confirm,.dot.on,.upload{background:var(--dojo-primary);border-color:var(--dojo-primary)}.student-name{color:var(--dojo-primary)}body{color:var(--dojo-text)}</style>
 
 <title>용인대 승리태권도 출석체크</title>
 
@@ -263,7 +264,8 @@ button{
 
 <div id="checkScreen">
 
-<div class="brand">용인대 승리태권도</div>
+<img id="dojoLogo" alt="도장 로고" style="display:none;max-width:120px;max-height:90px;object-fit:contain;margin:0 auto 12px">
+<div class="brand" id="dojoBrand">용인대 승리태권도</div>
 <h1>출석체크</h1>
 
 <div class="guide">
@@ -408,6 +410,39 @@ const SUPABASE_URL =
 
 const SUPABASE_KEY =
 "sb_publishable_lmwJJaHfZzE5hXnZnF49oA__F7JpDZ8";
+
+/* 관리자 페이지의 도장 기본 설정을 출석체크기에 반영 */
+async function loadDojoSettings(){
+  try{
+    const response=await fetch(SUPABASE_URL+"/rest/v1/rpc/get_dojo_settings",{
+      method:"POST",
+      headers:{"Content-Type":"application/json","apikey":SUPABASE_KEY,"Authorization":"Bearer "+SUPABASE_KEY},
+      body:"{}",
+      cache:"no-store"
+    });
+    if(!response.ok)throw new Error("도장 설정 조회 실패");
+    const raw=await response.json();
+    const settings=Array.isArray(raw)?raw[0]:raw;
+    if(!settings || typeof settings!=="object")return;
+    const name=String(settings.dojo_name||"용인대 승리태권도").trim();
+    document.getElementById("dojoBrand").textContent=name;
+    document.title=name+" 출석체크";
+    const primary=/^#[0-9a-f]{6}$/i.test(settings.primary_color||"")?settings.primary_color:"#062b5c";
+    const txt=/^#[0-9a-f]{6}$/i.test(settings.text_color||"")?settings.text_color:"#152238";
+    document.documentElement.style.setProperty("--dojo-primary",primary);
+    document.documentElement.style.setProperty("--dojo-text",txt);
+    document.querySelector('meta[name="theme-color"]').setAttribute("content",primary);
+    const logo=document.getElementById("dojoLogo");
+    const url=String(settings.logo_url||"");
+    if(/^https:\/\//i.test(url)||/^data:image\/(?:png|jpeg|webp|gif);base64,/i.test(url)){
+      logo.src=url;
+      logo.style.display="block";
+      logo.onerror=()=>{logo.style.display="none";};
+    }else{logo.removeAttribute("src");logo.style.display="none";}
+  }catch(error){console.warn("도장 설정을 불러오지 못해 기본 표시를 사용합니다.",error);}
+}
+loadDojoSettings();
+document.addEventListener("visibilitychange",()=>{if(!document.hidden)loadDojoSettings();});
 
 let pin="";
 let processing=false;
