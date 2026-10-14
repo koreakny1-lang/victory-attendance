@@ -349,7 +349,7 @@ onkeydown="if(event.key==='Enter') login()">
 <button onclick="openAdminPage('birthday')">🎂<strong>생일 관리</strong><span>이번 달 생일 확인</span></button>
 
 <button onclick="openAdminPage('links')">🔗<strong>주소 관리</strong><span>4가지 주소 복사</span></button>
-<button onclick="openAdminPage('program')">⚙️<strong>프로그램 관리</strong><span>도장명·로고·색상·연락처 변경</span></button>
+<button onclick="openAdminPage('program')">⚙️<strong>프로그램 관리</strong><span>도장 설정·수련생 항목 추가/수정</span></button>
 </div>
 </div>
 <div id="pageProgram" class="admin-page" hidden>
@@ -366,6 +366,15 @@ onkeydown="if(event.key==='Enter') login()">
 <div class="settings-preview"><img id="dojoLogoPreview" alt="도장 로고 미리보기" hidden><strong id="dojoNamePreview">용인대 승리태권도</strong></div>
 <button type="button" class="primary" id="dojoSaveBtn" onclick="saveDojoSettings()">도장 설정 저장</button>
 <div id="dojoSettingsMessage" class="message" role="status"></div>
+</section>
+<section class="card" id="customFieldsCard">
+<h2>🧩 수련생 정보 항목 관리</h2>
+<p class="settings-note">여기서 항목을 추가·이름 수정·표시/숨기기·순서 변경할 수 있습니다. 삭제 대신 숨기기를 사용하면 기존 입력값을 보존합니다. 변경 사항은 수련생 등록/수정 화면에 적용됩니다.</p>
+<div id="customFieldRows"></div>
+<div class="form-grid" style="margin-top:15px"><div class="field"><label>새 항목 이름</label><input id="customFieldName" placeholder="예: 보호자 메모"></div><div class="field"><label>입력 형식</label><select id="customFieldType"><option value="text">짧은 글</option><option value="textarea">긴 글</option><option value="date">날짜</option><option value="number">숫자</option></select></div></div>
+<button type="button" class="small-btn" onclick="addCustomField()">＋ 항목 추가</button>
+<button type="button" class="primary" id="customFieldsSave" onclick="saveCustomFields()">항목 설정 저장</button>
+<div id="customFieldsMessage" class="message" role="status"></div>
 </section>
 <section class="card" id="adminSecurityCard">
 <h2>🔐 관리자 보안 설정</h2>
@@ -544,6 +553,7 @@ onkeydown="if(event.key==='Enter') login()">
 
 <datalist id="classList"></datalist>
 
+<div id="customAddFields" class="form-grid" style="margin-top:15px"></div>
 <div id="addMessage" class="message"></div>
 
 </div>
@@ -640,6 +650,7 @@ oninput="renderStudents()">
 
 </div>
 
+<div id="customEditFields" class="form-grid" style="margin:14px 0"></div>
 <div class="modal-buttons">
 <button class="cancel" onclick="closeEdit()">취소</button>
 <button class="primary" id="saveEditBtn" onclick="saveEdit()">수정 저장</button>
@@ -859,6 +870,7 @@ updateDashboard();
 renderBirthdays();
 fillClassList();
 renderManualAttendance();
+if(!customFields.length)loadCustomFieldSettings();
 
 }catch(error){
 
@@ -1378,6 +1390,9 @@ return;
 
 message.className="message success";
 message.textContent=name+" 수련생 등록 완료! (출석번호 "+pin+")";
+const fresh=await rpc("admin_students",{admin_password:adminPassword});
+const newStudent=Array.isArray(fresh)?fresh.find(x=>String(x.pin)===pin):null;
+if(newStudent)await saveStudentCustomValues(newStudent.id,"customAddFields");
 
 [
 "name","pin","phone","birthDate",
@@ -1385,6 +1400,7 @@ message.textContent=name+" 수련생 등록 완료! (출석번호 "+pin+")";
 ].forEach(id=>document.getElementById(id).value="");
 
 await loadAll();
+renderCustomInputs("customAddFields",null);
 
 }catch(error){
 
@@ -1538,6 +1554,7 @@ document.getElementById("editBelt").value=s.belt||"";
 document.getElementById("editStatus").value=s.status||"재원";
 
 document.getElementById("editMessage").textContent="";
+renderCustomInputs("customEditFields",s.id);
 document.getElementById("editModal").style.display="flex";
 
 }
@@ -1611,6 +1628,7 @@ return;
 
 }
 
+await saveStudentCustomValues(editingStudent.id,"customEditFields");
 toast(name+" 정보를 저장했습니다.");
 closeEdit();
 await loadAll();
@@ -1879,12 +1897,43 @@ function downloadMonthlyCsv(){
  document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
 
+
+/* 프로그램 관리: 추가 수련생 항목 (관리자 인증 RPC) */
+let customFields=[],customValues={};
+const fieldMsg=(v,err=false)=>{const e=document.getElementById('customFieldsMessage');e.className='message '+(err?'error':'success');e.textContent=v;};
+function fieldEscape(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+async function loadCustomFieldSettings(){
+ try{const d=await rpc('admin_custom_fields',{admin_password:adminPassword});
+ customFields=Array.isArray(d.fields)?d.fields:[];customValues=d.values||{};
+ renderCustomFieldSettings();renderCustomInputs('customAddFields',null);
+ }catch(e){console.warn(e);fieldMsg('항목 관리 서버 연결이 필요합니다. 함께 제공한 SQL을 먼저 실행해 주세요.',true);}
+}
+function renderCustomFieldSettings(){
+ const box=document.getElementById('customFieldRows');box.innerHTML='';
+ customFields.forEach((f,i)=>{const row=document.createElement('div');row.style.cssText='display:flex;flex-wrap:wrap;gap:7px;align-items:center;padding:9px 0;border-bottom:1px solid #ddd';
+ row.innerHTML='<input aria-label="항목 이름" style="flex:1;min-width:125px" value="'+fieldEscape(f.label)+'"><label><input type="checkbox" '+(f.visible!==false?'checked':'')+'> 표시</label><button type="button">↑</button><button type="button">↓</button>';
+ row.querySelector('input:not([type])').addEventListener('input',e=>f.label=e.target.value);
+ row.querySelector('input[type=checkbox]').addEventListener('change',e=>{f.visible=e.target.checked;renderCustomInputs('customAddFields',null);});
+ const b=row.querySelectorAll('button');b[0].onclick=()=>moveCustomField(i,-1);b[1].onclick=()=>moveCustomField(i,1);
+ box.appendChild(row);});
+}
+function moveCustomField(i,delta){const j=i+delta;if(j<0||j>=customFields.length)return;[customFields[i],customFields[j]]=[customFields[j],customFields[i]];renderCustomFieldSettings();}
+function addCustomField(){const input=document.getElementById('customFieldName');const label=input.value.trim();if(!label){fieldMsg('항목 이름을 입력해 주세요.',true);return;}if(customFields.some(f=>f.label===label)){fieldMsg('같은 이름의 항목이 있습니다.',true);return;}
+ customFields.push({key:'f_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),label,type:document.getElementById('customFieldType').value,visible:true});input.value='';renderCustomFieldSettings();renderCustomInputs('customAddFields',null);fieldMsg('항목을 추가했습니다. 반드시 [항목 설정 저장]을 눌러 주세요.');}
+async function saveCustomFields(){const b=document.getElementById('customFieldsSave');if(customFields.some(f=>!f.label.trim())){fieldMsg('빈 항목 이름을 수정해 주세요.',true);return;}b.disabled=true;
+ try{const r=await rpc('admin_save_custom_fields',{admin_password:adminPassword,new_fields:customFields});if(!r?.success)throw Error(r?.message||'저장 실패');fieldMsg('항목 설정이 저장되었습니다.');await loadCustomFieldSettings();}catch(e){fieldMsg('저장 실패: '+e.message,true);}finally{b.disabled=false;}}
+function renderCustomInputs(containerId,studentId){const box=document.getElementById(containerId);if(!box)return;box.innerHTML='';const vals=studentId?(customValues[String(studentId)]||{}):{};
+ customFields.filter(f=>f.visible!==false).forEach(f=>{const wrap=document.createElement('div');wrap.className='field';const label=document.createElement('label');label.textContent=f.label;const input=document.createElement(f.type==='textarea'?'textarea':'input');if(f.type!=='textarea')input.type=['date','number'].includes(f.type)?f.type:'text';input.dataset.fieldKey=f.key;input.value=vals[f.key]??'';wrap.append(label,input);box.appendChild(wrap);});}
+async function saveStudentCustomValues(studentId,containerId){const values={...(customValues[String(studentId)]||{})};document.querySelectorAll('#'+containerId+' [data-field-key]').forEach(el=>values[el.dataset.fieldKey]=el.value);
+ const r=await rpc('admin_save_custom_values',{admin_password:adminPassword,target_student_id:Number(studentId),new_values:values});if(!r?.success)throw Error(r?.message||'추가 항목 저장 실패');customValues[String(studentId)]=values;}
+
 function openAdminPage(page){
  const ids={monthly:"pageMonthly",manual:"pageManual",home:"adminHome",attendance:"pageAttendance",students:"pageStudents",birthday:"pageBirthday",program:"pageProgram",links:"pageLinks"};
  if(!ids[page])page="home";
  for(const [key,id] of Object.entries(ids))document.getElementById(id).hidden=key!==page;
  document.querySelectorAll(".manage-nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===page));
  if(page==="manual")refreshManualAttendance();
+ if(page==="program")loadCustomFieldSettings();
  if(page==="monthly"){initMonthlySelectors();if(!monthlyViewData())loadMonthlyAttendance();else renderMonthlyAttendance();}
  window.scrollTo({top:0,behavior:"instant"});
 }
