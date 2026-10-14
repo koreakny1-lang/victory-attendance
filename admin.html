@@ -243,6 +243,43 @@ header h1{color:#fff}
 .manual-student small{font-size:12px;font-weight:600}
 .manual-summary{font-weight:800;margin:12px 0 16px}
 @media(max-width:500px){.manual-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}.manual-student{font-size:15px;min-height:80px}}
+
+/* 월별 출석부 */
+.monthly-toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:end;margin:14px 0}
+.monthly-toolbar label{font-weight:700;font-size:14px;display:flex;flex-direction:column;gap:5px}
+.monthly-toolbar select,.monthly-toolbar input{border:1px solid #cdd7e4;border-radius:9px;padding:10px;font-size:15px}
+.monthly-toolbar button{border:0;border-radius:9px;padding:11px 14px;background:var(--dojo-primary,#062b5c);color:white;font-weight:800}
+.monthly-table-wrap{overflow-x:auto;width:100%;border:1px solid #dfe5ed;border-radius:10px}
+.monthly-table{border-collapse:collapse;width:100%;min-width:980px;font-size:12px;white-space:nowrap}
+.monthly-table th,.monthly-table td{border:1px solid #d9e1e9;text-align:center;padding:7px 3px}
+.monthly-table thead th{background:#eaf1fb;color:#193657}
+.monthly-table .student-col{text-align:left;min-width:70px;padding-left:6px}
+.monthly-table .day-col{min-width:24px}
+.monthly-table .marked{background:#dff4e7;color:#087c42;font-weight:900}
+.monthly-table .sum-col{font-weight:900;background:#f2f5fb}
+.monthly-caption{font-size:13px;color:#526378;margin:10px 0}
+.monthly-print-head{display:none}
+@page{size:A4 landscape;margin:9mm}
+@media print{
+ body{background:white!important;color:#111!important;font-family:Arial,'Noto Sans KR',sans-serif!important}
+ body *{visibility:hidden!important}
+ #pageMonthly,#pageMonthly *{visibility:visible!important}
+ #pageMonthly{position:absolute!important;left:0;top:0;width:100%!important;display:block!important;margin:0!important;padding:0!important}
+ #pageMonthly .card{border:0!important;box-shadow:none!important;padding:0!important;margin:0!important}
+ #pageMonthly .monthly-toolbar,#pageMonthly .monthly-caption,#pageMonthly .monthly-screen-title,#pageMonthly #monthlyMessage{display:none!important}
+ #pageMonthly .monthly-print-head{display:block!important;text-align:center;font-size:17px;font-weight:900;margin:0 0 7mm}
+ #pageMonthly .monthly-table-wrap{overflow:visible!important;border:0!important}
+ #pageMonthly .monthly-table{min-width:0!important;width:100%!important;table-layout:fixed!important;font-size:7px!important;white-space:nowrap!important}
+ #pageMonthly .monthly-table th,#pageMonthly .monthly-table td{padding:3px 0!important;border:1px solid #777!important;line-height:1.3!important;overflow:hidden}
+ #pageMonthly .monthly-table .student-col{width:54px!important;min-width:0!important;padding-left:2px!important}
+ #pageMonthly .monthly-table .class-col{width:45px!important}
+ #pageMonthly .monthly-table .num-col{width:18px!important}
+ #pageMonthly .monthly-table .sum-col{width:25px!important}
+ #pageMonthly .monthly-table .day-col{min-width:0!important}
+ #pageMonthly thead{display:table-header-group!important}
+ #pageMonthly tr{break-inside:avoid!important;page-break-inside:avoid!important}
+ #pageMonthly .monthly-table .marked{background:#ddd!important;color:#000!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
 </style>
 </head>
 
@@ -284,6 +321,7 @@ onkeydown="if(event.key==='Enter') login()">
 
 <nav class="manage-nav" aria-label="관리자 메뉴">
 <button type="button" data-page="home" onclick="openAdminPage('home')">🏠 홈</button>
+<button type="button" data-page="monthly" onclick="openAdminPage('monthly')">📅 월별 출석부</button>
 <button type="button" data-page="manual" onclick="openAdminPage('manual')">✅ 터치 출석</button>
 <button type="button" data-page="attendance" onclick="openAdminPage('attendance')">📋 출결 관리</button>
 <button type="button" data-page="students" onclick="openAdminPage('students')">👨‍🎓 수련생 관리</button>
@@ -296,6 +334,7 @@ onkeydown="if(event.key==='Enter') login()">
 <h2>관리자 홈</h2>
 <p class="settings-note">필요한 메뉴를 선택하면 해당 관리 화면으로 이동합니다.</p>
 <div class="home-grid">
+<button onclick="openAdminPage('monthly')">📅<strong>월별 출석부</strong><span>조회·A4 인쇄·엑셀 다운로드</span></button>
 <button onclick="openAdminPage('manual')">✅<strong>터치 출석</strong><span>이름을 눌러 출석체크</span></button>
 <button onclick="openAdminPage('attendance')">📋<strong>출결 관리</strong><span>출석·미출석 확인 및 처리</span></button>
 <button onclick="openAdminPage('students')">👨‍🎓<strong>수련생 관리</strong><span>등록·수정·명단 관리</span></button>
@@ -342,6 +381,23 @@ onkeydown="if(event.key==='Enter') login()">
 <div id="addressRows"></div>
 </section>
 
+</div>
+<div id="pageMonthly" class="admin-page" hidden>
+<section class="card">
+<h2 class="monthly-screen-title">📅 월별 출석부</h2>
+<p class="monthly-caption">기존 출석번호와 터치 출석 기록을 통합해 표시합니다. ○는 출석한 날입니다. A4 가로 인쇄 또는 PDF 저장이 가능합니다.</p>
+<div class="monthly-toolbar">
+<label>연도 <select id="monthlyYear"></select></label>
+<label>월 <select id="monthlyMonth"></select></label>
+<label>수련반 <select id="monthlyClass" onchange="renderMonthlyAttendance()"><option value="">전체 수련반</option></select></label>
+<button type="button" onclick="loadMonthlyAttendance()">🔍 조회</button>
+<button type="button" onclick="printMonthlyAttendance()">🖨️ A4 인쇄 / PDF</button>
+<button type="button" onclick="downloadMonthlyCsv()">⬇️ 엑셀용 CSV</button>
+</div>
+<div id="monthlyMessage" class="monthly-caption" role="status">조회할 연월을 선택하세요.</div>
+<div id="monthlyPrintHead" class="monthly-print-head"></div>
+<div class="monthly-table-wrap"><table class="monthly-table" id="monthlyTable"><thead></thead><tbody></tbody></table></div>
+</section>
 </div>
 <div id="pageManual" class="admin-page" hidden>
 <section class="card">
@@ -1711,12 +1767,111 @@ async function markManualStudent(s,wasPresent){
  finally{manualBusy=false;renderManualAttendance();}
 }
 
+
+/* 월별 출석부: 기존 attendance 기록 조회 전용, 출석·귀가 데이터 수정 없음 */
+let monthlyRows=[];
+let monthlyLoadedKey="";
+let monthlyLoading=false;
+function initMonthlySelectors(){
+ const y=document.getElementById("monthlyYear"),m=document.getElementById("monthlyMonth");
+ if(y.options.length)return;
+ const now=new Date();const year=Number(new Intl.DateTimeFormat("en-US",{timeZone:"Asia/Seoul",year:"numeric"}).format(now));
+ const month=Number(new Intl.DateTimeFormat("en-US",{timeZone:"Asia/Seoul",month:"numeric"}).format(now));
+ for(let v=year-5;v<=year+1;v++)y.add(new Option(v+"년",v));
+ for(let v=1;v<=12;v++)m.add(new Option(v+"월",v));
+ y.value=String(year);m.value=String(month);
+}
+function monthlyParams(){
+ return {year:Number(document.getElementById("monthlyYear").value),month:Number(document.getElementById("monthlyMonth").value)};
+}
+async function loadMonthlyAttendance(){
+ if(monthlyLoading||!adminPassword)return;
+ initMonthlySelectors();const {year,month}=monthlyParams();
+ const status=document.getElementById("monthlyMessage");
+ monthlyLoading=true;status.textContent="월별 출석 기록을 불러오는 중입니다...";
+ try{
+  const rows=await rpc("admin_monthly_attendance",{admin_password:adminPassword,target_year:year,target_month:month});
+  if(!Array.isArray(rows))throw new Error("출석부 응답 형식이 올바르지 않습니다.");
+  monthlyRows=rows;monthlyLoadedKey=year+"-"+month;
+  const classes=[...new Set(rows.map(r=>String(r.class_name||"").trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"ko"));
+  const select=document.getElementById("monthlyClass"),prev=select.value;
+  select.replaceChildren(new Option("전체 수련반",""),...classes.map(c=>new Option(c,c)));
+  select.value=classes.includes(prev)?prev:"";
+  renderMonthlyAttendance();
+ }catch(e){console.error(e);monthlyRows=[];monthlyLoadedKey="";renderMonthlyAttendance();status.textContent="조회 실패: "+(e.message||"서버 연결을 확인해주세요.");}
+ finally{monthlyLoading=false;}
+}
+function monthlyViewData(){
+ const {year,month}=monthlyParams();
+ if(monthlyLoadedKey!==year+"-"+month)return null;
+ const cls=document.getElementById("monthlyClass").value;
+ const days=new Date(year,month,0).getDate();
+ const map=new Map();
+ for(const r of monthlyRows){
+  if(cls&&String(r.class_name||"").trim()!==cls)continue;
+  const key=String(r.student_id);
+  if(!map.has(key))map.set(key,{name:String(r.student_name||""),cls:String(r.class_name||""),dates:new Set()});
+  if(r.attendance_date)map.get(key).dates.add(String(r.attendance_date).slice(0,10));
+ }
+ const people=[...map.values()].sort((a,b)=>a.name.localeCompare(b.name,"ko"));
+ return {year,month,days,people,cls};
+}
+function renderMonthlyAttendance(){
+ const table=document.getElementById("monthlyTable");if(!table)return;
+ const head=table.tHead,body=table.tBodies[0];head.replaceChildren();body.replaceChildren();
+ const data=monthlyViewData();
+ if(!data){document.getElementById("monthlyMessage").textContent="연월을 선택하고 조회 버튼을 눌러주세요.";return;}
+ const {year,month,days,people,cls}=data;
+ const dojo=typeof dojoSettings!=="undefined"&&dojoSettings?.dojo_name?dojoSettings.dojo_name:"용인대 승리태권도";
+ document.getElementById("monthlyPrintHead").textContent=dojo+" · "+year+"년 "+month+"월 출석부"+(cls?" · "+cls:"");
+ const row=head.insertRow();
+ function th(text,klass){const el=document.createElement("th");el.textContent=text;if(klass)el.className=klass;row.append(el);}
+ th("번호","num-col");th("이름","student-col");th("수련반","class-col");
+ for(let day=1;day<=days;day++)th(String(day),"day-col");th("합계","sum-col");
+ people.forEach((p,index)=>{
+  const tr=body.insertRow();
+  const num=tr.insertCell();num.textContent=index+1;num.className="num-col";
+  const name=tr.insertCell();name.textContent=p.name;name.className="student-col";
+  const clsCell=tr.insertCell();clsCell.textContent=p.cls;clsCell.className="class-col";
+  let count=0;
+  for(let day=1;day<=days;day++){
+   const date=year+"-"+String(month).padStart(2,"0")+"-"+String(day).padStart(2,"0");
+   const td=tr.insertCell();td.className="day-col";
+   if(p.dates.has(date)){td.textContent="○";td.classList.add("marked");count++;}
+  }
+  const total=tr.insertCell();total.textContent=count;total.className="sum-col";
+ });
+ document.getElementById("monthlyMessage").textContent=year+"년 "+month+"월 · "+people.length+"명 · 출석일 수 기준 (귀가 중복 제외)";
+}
+function printMonthlyAttendance(){
+ if(!monthlyViewData()){alert("먼저 해당 월 출석부를 조회해주세요.");return;}
+ window.print();
+}
+function downloadMonthlyCsv(){
+ const data=monthlyViewData();if(!data){alert("먼저 해당 월 출석부를 조회해주세요.");return;}
+ const {year,month,days,people,cls}=data;
+ const quote=v=>'"'+String(v??"").replace(/"/g,'""')+'"';
+ const lines=[["번호","이름","수련반",...Array.from({length:days},(_,i)=>(i+1)+"일"),"합계"]];
+ people.forEach((p,index)=>{
+  const marks=Array.from({length:days},(_,i)=>{
+   const date=year+"-"+String(month).padStart(2,"0")+"-"+String(i+1).padStart(2,"0");
+   return p.dates.has(date)?"○":"";
+  });
+  lines.push([index+1,p.name,p.cls,...marks,marks.filter(Boolean).length]);
+ });
+ const blob=new Blob(["\uFEFF"+lines.map(row=>row.map(quote).join(",")).join("\r\n")],{type:"text/csv;charset=utf-8;"});
+ const url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;
+ a.download=year+"년_"+month+"월_출석부"+(cls?"_"+cls.replace(/[\\/:*?"<>|]/g,"_"):"")+".csv";
+ document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+
 function openAdminPage(page){
- const ids={manual:"pageManual",home:"adminHome",attendance:"pageAttendance",students:"pageStudents",birthday:"pageBirthday",program:"pageProgram",links:"pageLinks"};
+ const ids={monthly:"pageMonthly",manual:"pageManual",home:"adminHome",attendance:"pageAttendance",students:"pageStudents",birthday:"pageBirthday",program:"pageProgram",links:"pageLinks"};
  if(!ids[page])page="home";
  for(const [key,id] of Object.entries(ids))document.getElementById(id).hidden=key!==page;
  document.querySelectorAll(".manage-nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===page));
  if(page==="manual")refreshManualAttendance();
+ if(page==="monthly"){initMonthlySelectors();if(!monthlyViewData())loadMonthlyAttendance();else renderMonthlyAttendance();}
  window.scrollTo({top:0,behavior:"instant"});
 }
 function fillDojoForm(d){
