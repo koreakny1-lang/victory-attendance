@@ -369,14 +369,14 @@ onkeydown="if(event.key==='Enter') login()">
 </section>
 <section class="card" id="customFieldsCard">
 <h2>🧩 수련생 정보 항목 관리</h2>
-<p class="settings-note">여기서 항목을 추가·이름 수정·표시/숨기기·순서 변경할 수 있습니다. 삭제 대신 숨기기를 사용하면 기존 입력값을 보존합니다. 변경 사항은 수련생 등록/수정 화면에 적용됩니다.</p>
+<p class="settings-note">「수련생 관리 → 수련생 등록」의 입력칸을 늘리거나 줄이는 설정입니다. 필요 없는 항목은 [숨기기], 다시 쓰려면 [표시]를 누르세요. 저장된 학생 데이터는 그대로 유지됩니다.</p>
 <h3 style="margin:18px 0 7px">✏️ 기존 항목 수정</h3>
-<p class="settings-note">기본 항목의 이름을 바꾸거나 표시를 끌 수 있습니다. 이름·출석번호는 필수이므로 숨길 수 없습니다. 변경한 뒤 아래 [항목 설정 저장]을 누르세요.</p>
+<p class="settings-note">아래 수련생 등록 화면에 나오는 입력칸을 직접 편집합니다. 이름 변경, 순서 ↑↓, 표시/숨김으로 칸을 줄이거나 늘릴 수 있습니다. 이름·출석번호는 필수입니다. 변경 후 맨 아래 저장을 누르세요.</p>
 <div id="baseFieldRows"></div>
-<h3 style="margin:20px 0 8px">➕ 추가한 항목 관리</h3>
+<h3 style="margin:20px 0 8px">➕ 입력칸 추가 / 제거</h3>
 <div id="customFieldRows"></div>
 <div class="form-grid" style="margin-top:15px"><div class="field"><label>새 항목 이름</label><input id="customFieldName" placeholder="예: 보호자 메모"></div><div class="field"><label>입력 형식</label><select id="customFieldType"><option value="text">짧은 글</option><option value="textarea">긴 글</option><option value="date">날짜</option><option value="number">숫자</option></select></div></div>
-<button type="button" class="small-btn" onclick="addCustomField()">＋ 항목 추가</button>
+<button type="button" class="small-btn" onclick="addCustomField()">＋ 등록 화면에 입력칸 추가</button>
 <button type="button" class="primary" id="customFieldsSave" onclick="saveCustomFields()">항목 설정 저장</button>
 <div id="customFieldsMessage" class="message" role="status"></div>
 </section>
@@ -1910,30 +1910,59 @@ const BASE_FIELD_DEFS=[
  ['grade','학년',false],['belt','띠',false],['status','상태',true]
 ];
 const BASE_CONFIG_KEY='__victory_base_field_settings__';
+function getBaseOrder(){
+ const keys=BASE_FIELD_DEFS.map(x=>x[0]);
+ const saved=Array.isArray(baseFieldSettings._order)?baseFieldSettings._order:[];
+ return [...saved.filter(k=>keys.includes(k)),...keys.filter(k=>!saved.includes(k))];
+}
+function moveBaseField(key,step){
+ const arr=getBaseOrder(),i=arr.indexOf(key),j=i+step;
+ if(j<0||j>=arr.length)return;
+ [arr[i],arr[j]]=[arr[j],arr[i]];baseFieldSettings._order=arr;
+ renderBaseFieldSettings();applyBaseFieldSettings();
+}
 function renderBaseFieldSettings(){
  const box=document.getElementById('baseFieldRows');if(!box)return;box.innerHTML='';
- BASE_FIELD_DEFS.forEach(([key,original,required])=>{
-  const cfg=baseFieldSettings[key]||{};
-  const row=document.createElement('div');row.style.cssText='display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:8px 0;border-bottom:1px solid #e2e8f0';
-  const desc=document.createElement('span');desc.textContent=original;desc.style.cssText='min-width:115px;font-weight:600';
-  const name=document.createElement('input');name.value=cfg.label||original;name.setAttribute('aria-label',original+' 표시 이름');name.style.cssText='flex:1;min-width:130px';
+ const defs=Object.fromEntries(BASE_FIELD_DEFS.map(x=>[x[0],x]));
+ getBaseOrder().forEach((key,i)=>{
+  const [,original,required]=defs[key],cfg=baseFieldSettings[key]||{};
+  const row=document.createElement('div');row.style.cssText='display:flex;gap:7px;align-items:center;flex-wrap:wrap;padding:9px 0;border-bottom:1px solid #e2e8f0';
+  const desc=document.createElement('span');desc.textContent=original;desc.style.cssText='min-width:100px;font-weight:600';
+  const name=document.createElement('input');name.value=cfg.label||original;name.setAttribute('aria-label',original+' 항목 이름');name.style.cssText='flex:1;min-width:115px';
   name.addEventListener('input',()=>{baseFieldSettings[key]={...(baseFieldSettings[key]||{}),label:name.value};applyBaseFieldSettings();});
-  const label=document.createElement('label');label.style.cssText='display:flex;align-items:center;gap:5px';
-  const check=document.createElement('input');check.type='checkbox';check.checked=required||cfg.visible!==false;check.disabled=required;
-  check.addEventListener('change',()=>{baseFieldSettings[key]={...(baseFieldSettings[key]||{}),visible:check.checked};applyBaseFieldSettings();});
-  label.append(check,document.createTextNode(required?'필수':'표시'));row.append(desc,name,label);box.appendChild(row);
+  const toggle=document.createElement('button');toggle.type='button';toggle.className='small-btn';
+  const visible=required||cfg.visible!==false;toggle.textContent=required?'필수':visible?'👁 표시 중':'🚫 숨김';toggle.disabled=required;
+  toggle.onclick=()=>{baseFieldSettings[key]={...(baseFieldSettings[key]||{}),visible:!visible};renderBaseFieldSettings();applyBaseFieldSettings();};
+  const up=document.createElement('button');up.type='button';up.textContent='↑';up.disabled=i===0;up.onclick=()=>moveBaseField(key,-1);
+  const down=document.createElement('button');down.type='button';down.textContent='↓';down.disabled=i===getBaseOrder().length-1;down.onclick=()=>moveBaseField(key,1);
+  row.append(desc,name,toggle,up,down);box.appendChild(row);
  });
 }
 function applyBaseFieldSettings(){
  const ids={name:['name','editName'],pin:['pin','editPin'],phone:['phone','editPhone'],birthDate:['birthDate','editBirthDate'],className:['className','editClass'],school:['school','editSchool'],grade:['grade','editGrade'],belt:['belt','editBelt'],status:['editStatus']};
- for(const [key,original,required] of BASE_FIELD_DEFS){
-  const cfg=baseFieldSettings[key]||{};
+ const defs=Object.fromEntries(BASE_FIELD_DEFS.map(x=>[x[0],x]));
+ const order=getBaseOrder();
+ for(const key of order){
+  const [,original,required]=defs[key],cfg=baseFieldSettings[key]||{};
   for(const id of ids[key]){
    const input=document.getElementById(id);if(!input)continue;
    const field=input.closest('.field');if(!field)continue;
-   const label=field.querySelector('label');if(label)label.textContent=cfg.label?.trim()||original;
+   const label=field.querySelector('label');if(label)label.textContent=(cfg.label?.trim()||original)+(required&&key!=='status'?' *':'');
    field.style.display=required||cfg.visible!==false?'':'none';
   }
+ }
+ // 수련생 등록/수정 화면의 실제 입력칸 순서까지 반영
+ for(const edit of [false,true]){
+  const prefix=edit?'edit':'';
+  const sample=document.getElementById(edit?'editName':'name');
+  const grid=sample?.closest('.form-grid');if(!grid)continue;
+  const buttonRow=!edit?document.getElementById('addBtn')?.closest('.field'):null;
+  for(const key of order){
+   const id=edit?(ids[key].find(v=>v.startsWith('edit'))):(ids[key].find(v=>!v.startsWith('edit')));
+   const field=document.getElementById(id)?.closest('.field');
+   if(field&&field.parentElement===grid)grid.appendChild(field);
+  }
+  if(buttonRow&&buttonRow.parentElement===grid)grid.appendChild(buttonRow);
  }
 }
 
@@ -1952,10 +1981,10 @@ async function loadCustomFieldSettings(){
 function renderCustomFieldSettings(){
  const box=document.getElementById('customFieldRows');box.innerHTML='';
  customFields.forEach((f,i)=>{const row=document.createElement('div');row.style.cssText='display:flex;flex-wrap:wrap;gap:7px;align-items:center;padding:9px 0;border-bottom:1px solid #ddd';
- row.innerHTML='<input aria-label="항목 이름" style="flex:1;min-width:125px" value="'+fieldEscape(f.label)+'"><label><input type="checkbox" '+(f.visible!==false?'checked':'')+'> 표시</label><button type="button">↑</button><button type="button">↓</button>';
+ row.innerHTML='<input aria-label="항목 이름" style="flex:1;min-width:125px" value="'+fieldEscape(f.label)+'"><label><input type="checkbox" '+(f.visible!==false?'checked':'')+'> 표시</label><button type="button">↑</button><button type="button">↓</button><button type="button">숨기기</button>';
  row.querySelector('input:not([type])').addEventListener('input',e=>f.label=e.target.value);
  row.querySelector('input[type=checkbox]').addEventListener('change',e=>{f.visible=e.target.checked;renderCustomInputs('customAddFields',null);});
- const b=row.querySelectorAll('button');b[0].onclick=()=>moveCustomField(i,-1);b[1].onclick=()=>moveCustomField(i,1);
+ const b=row.querySelectorAll('button');b[0].onclick=()=>moveCustomField(i,-1);b[1].onclick=()=>moveCustomField(i,1);b[2].onclick=()=>{f.visible=false;renderCustomFieldSettings();renderCustomInputs('customAddFields',null);fieldMsg('입력칸을 숨겼습니다. 저장하면 반영됩니다.');};
  box.appendChild(row);});
 }
 function moveCustomField(i,delta){const j=i+delta;if(j<0||j>=customFields.length)return;[customFields[i],customFields[j]]=[customFields[j],customFields[i]];renderCustomFieldSettings();}
