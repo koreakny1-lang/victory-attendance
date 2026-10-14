@@ -307,6 +307,8 @@ onkeydown="if(event.key==='Enter') login()">
 <button type="button" class="primary" id="dojoSaveBtn" onclick="saveDojoSettings()">도장 설정 저장</button>
 <div id="dojoSettingsMessage" class="message" role="status"></div>
 </section>
+
+<section class="card" id="dojoUiSettingsCard"><h2>🛠 화면·알림 항목 수정</h2><p class="settings-note">설정 저장 후 출석체크기와 학부모 화면에 반영됩니다. 알림 문구는 발송 함수도 별도로 연결해야 반영됩니다. 앱 아이콘은 이미지 파일 교체가 필요합니다.</p><div class="form-grid"><div class="field full"><label for="ui_kiosk_title">출석체크기 제목</label><input id="ui_kiosk_title" type="text" data-key="kiosk_title" value="출석체크" maxlength="120"></div><div class="field full"><label for="ui_kiosk_guide">출석체크기 안내 문구</label><input id="ui_kiosk_guide" type="text" data-key="kiosk_guide" value="출석번호 4자리를 입력해주세요" maxlength="120"></div><div class="field "><label for="ui_kiosk_bg">출석체크기 배경색</label><input id="ui_kiosk_bg" type="color" data-key="kiosk_bg" value="#f4f7fb" maxlength="120"></div><div class="field full"><label for="ui_parent_subtitle">학부모 화면 설명</label><input id="ui_parent_subtitle" type="text" data-key="parent_subtitle" value="학부모 출석확인 · 전체 기록" maxlength="120"></div><div class="field full"><label for="ui_parent_guide">학부모 안내 문구</label><input id="ui_parent_guide" type="text" data-key="parent_guide" value="자녀의 출석번호 4자리를 입력해 주세요." maxlength="120"></div><div class="field "><label for="ui_parent_bg">학부모 화면 배경색</label><input id="ui_parent_bg" type="color" data-key="parent_bg" value="#f3f6fb" maxlength="120"></div><div class="field full"><label for="ui_push_attendance">출석 알림 문구 (이름·시간은 자동 포함)</label><input id="ui_push_attendance" type="text" data-key="push_attendance" value="출석했습니다." maxlength="120"></div><div class="field full"><label for="ui_push_departure">귀가 알림 문구 (이름·시간은 자동 포함)</label><input id="ui_push_departure" type="text" data-key="push_departure" value="귀가했습니다." maxlength="120"></div><div class="field full"><label for="ui_app_name">앱 표시 이름 (홈 화면 아이콘 이름은 재설치 필요)</label><input id="ui_app_name" type="text" data-key="app_name" value="승리태권도" maxlength="120"></div></div><button type="button" class="primary" id="uiSaveBtn" onclick="saveUiSettings()">화면 항목 저장</button><div id="uiSaveMessage" class="message"></div></section>
 <section class="card" id="adminSecurityCard">
 <h2>🔐 관리자 보안 설정</h2>
 <p class="settings-note">최초 등록은 현재 관리자 비밀번호로 확인한 후 진행합니다. 이후에는 현재 비밀번호를 입력하여 변경할 수 있습니다. 새 비밀번호는 8자 이상으로 설정하세요.</p>
@@ -1718,6 +1720,25 @@ function buildAddressRows(){
 document.querySelectorAll("#dojoSettingsCard input").forEach(x=>x.addEventListener("input",showDojoPreview));
 buildAddressRows();
 openAdminPage("home");
+
+
+/* 화면 항목 설정 */
+const uiDefaults = {"kiosk_title": "출석체크", "kiosk_guide": "출석번호 4자리를 입력해주세요", "kiosk_bg": "#f4f7fb", "parent_subtitle": "학부모 출석확인 · 전체 기록", "parent_guide": "자녀의 출석번호 4자리를 입력해 주세요.", "parent_bg": "#f3f6fb", "push_attendance": "출석했습니다.", "push_departure": "귀가했습니다.", "app_name": "승리태권도"};
+async function loadUiSettings(){
+ try{const raw=await rpc('get_dojo_ui_settings',{});const data=typeof raw==='object'&&raw&&!Array.isArray(raw)?raw:{};
+ for(const [key,value] of Object.entries(uiDefaults)){const field=document.getElementById('ui_'+key);if(field)field.value=typeof data[key]==='string'?data[key]:value;}}
+ catch(e){console.warn('화면 설정을 불러오지 못했습니다.',e);}
+}
+async function saveUiSettings(){
+ const msg=document.getElementById('uiSaveMessage'),btn=document.getElementById('uiSaveBtn');
+ const data={};for(const key of Object.keys(uiDefaults))data[key]=document.getElementById('ui_'+key).value.trim();
+ btn.disabled=true;msg.textContent='저장 중...';msg.className='message';
+ try{const result=await rpc('admin_save_dojo_ui_settings',{admin_password:adminPassword,new_settings:data});
+ if(!result?.success)throw Error(result?.message||'저장 실패');msg.textContent='저장되었습니다. 출석체크기와 학부모 화면을 새로고침해 확인하세요.';msg.className='message success';}
+ catch(e){console.error(e);msg.textContent='저장 실패: SQL 설치 및 관리자 인증을 확인해 주세요.';msg.className='message error';}
+ finally{btn.disabled=false;}
+}
+loadUiSettings();
 
 /* 새로고침해도 로그인 유지 */
 const savedPw=store("get");
