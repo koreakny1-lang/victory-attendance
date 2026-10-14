@@ -256,6 +256,11 @@ header h1{color:#fff}
 .monthly-table .student-col{text-align:center;min-width:70px;padding-left:3px;padding-right:3px}
 .monthly-table .day-col{min-width:24px}
 .monthly-table .marked{background:#dff4e7;color:#087c42;font-weight:900}
+/* 토요일·일요일 날짜 열 전체에 연한 파란 배경 */
+.monthly-table .weekend-col{background:rgba(100,165,235,.18)}
+.monthly-table thead th.weekend-col{background:rgba(100,165,235,.32)}
+/* 주말 출석도 출석 원 표시와 초록 강조를 유지 */
+.monthly-table td.weekend-col.marked{background:#cceadf;color:#087c42;font-weight:900}
 .monthly-table .sum-col{font-weight:900;background:#f2f5fb}
 .monthly-caption{font-size:13px;color:#526378;margin:10px 0}
 .monthly-print-head{display:none}
@@ -278,7 +283,10 @@ header h1{color:#fff}
  #pageMonthly .monthly-table .day-col{min-width:0!important}
  #pageMonthly thead{display:table-header-group!important}
  #pageMonthly tr{break-inside:avoid!important;page-break-inside:avoid!important}
+ #pageMonthly .monthly-table .weekend-col{background:#e6f1fc!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+ #pageMonthly .monthly-table thead th.weekend-col{background:#cfe3f8!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
  #pageMonthly .monthly-table .marked{background:#ddd!important;color:#000!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+ #pageMonthly .monthly-table td.weekend-col.marked{background:#cceadf!important;color:#000!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
 </style>
 </head>
@@ -1827,7 +1835,11 @@ function renderMonthlyAttendance(){
  const row=head.insertRow();
  function th(text,klass){const el=document.createElement("th");el.textContent=text;if(klass)el.className=klass;row.append(el);}
  th("번호","num-col");th("이름","student-col");th("수련반","class-col");
- for(let day=1;day<=days;day++)th(String(day),"day-col");th("합계","sum-col");
+ for(let day=1;day<=days;day++){
+  const weekday=new Date(Date.UTC(year,month-1,day)).getUTCDay();
+  th(String(day),"day-col"+(weekday===0||weekday===6?" weekend-col":""));
+ }
+ th("합계","sum-col");
  people.forEach((p,index)=>{
   const tr=body.insertRow();
   const num=tr.insertCell();num.textContent=index+1;num.className="num-col";
@@ -1836,7 +1848,9 @@ function renderMonthlyAttendance(){
   let count=0;
   for(let day=1;day<=days;day++){
    const date=year+"-"+String(month).padStart(2,"0")+"-"+String(day).padStart(2,"0");
-   const td=tr.insertCell();td.className="day-col";
+   const td=tr.insertCell();
+   const weekday=new Date(Date.UTC(year,month-1,day)).getUTCDay();
+   td.className="day-col"+(weekday===0||weekday===6?" weekend-col":"");
    if(p.dates.has(date)){td.textContent="○";td.classList.add("marked");count++;}
   }
   const total=tr.insertCell();total.textContent=count;total.className="sum-col";
