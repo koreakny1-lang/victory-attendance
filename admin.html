@@ -240,6 +240,25 @@ input[type="color"]{width:54px!important;max-width:54px!important;height:40px!im
 .history-scroll{overflow-x:auto}.history-table{width:100%;border-collapse:collapse;min-width:500px;font-size:14px}.history-table th,.history-table td{border-bottom:1px solid #e5eaf1;padding:12px 8px;text-align:left}.history-table th{background:#f3f6fb;color:#324b6b}
 .history-calendar{background:#f7faff;padding:14px;border-radius:14px;margin:15px 0}.history-calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}.history-day{text-align:center;min-height:55px;border-radius:9px;padding:7px 2px;background:#fff;font-size:13px}.history-day.yes{background:#dff4e7;color:#087040;font-weight:800}.history-day small{display:block;font-size:10px;margin-top:4px}.history-day.empty{background:transparent}.history-cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:10px}
 @media(max-width:700px){.history-controls{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* 날짜별 수련생 출석 현황 바둑판 */
+.daily-board{margin:18px 0;padding:16px;border:1px solid #dce5f1;border-radius:14px;background:#fbfdff}
+.daily-board-head{display:flex;align-items:end;gap:12px;flex-wrap:wrap;justify-content:space-between}
+.daily-board-head h3{margin:0 0 5px;font-size:19px}.daily-board-head p{margin:0;color:#68798b;font-size:12px}
+.daily-board-head .field{max-width:190px;min-width:150px}.daily-board-head input{width:100%}
+.daily-board-summary{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+.daily-board-summary span{padding:8px 12px;background:#eaf0f8;border-radius:9px;font-weight:700;font-size:13px}
+.daily-board-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px}
+.daily-board-tile{min-width:0;padding:12px 8px;border-radius:12px;border:1px solid #e2e7ef;background:#f2f4f7;text-align:center}
+.daily-board-tile.present{background:#e1f6e9;border-color:#a9dfbf}
+.daily-board-tile.departed{background:#e7efff;border-color:#b4c9fa}
+.daily-board-tile strong{display:block;font-size:14px;overflow-wrap:anywhere}
+.daily-board-tile small{display:block;font-size:11px;margin-top:5px;color:#526274}
+.daily-board-tile .daily-status{display:block;font-weight:700;margin-top:7px;font-size:12px}
+.daily-board-tile.present .daily-status{color:#08743b}.daily-board-tile.departed .daily-status{color:#234da8}
+.daily-board-empty{padding:20px 0;color:#63758a}
+@media(max-width:700px){.daily-board-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:420px){.daily-board-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
 </head>
 
@@ -422,6 +441,12 @@ onkeydown="if(event.key==='Enter') login()">
 </div>
 <div class="history-buttons"><button type="button" class="primary" onclick="loadHistory()">🔎 기록 조회</button><button type="button" class="small-btn" onclick="downloadHistoryCsv()">📥 조회 결과 CSV</button></div>
 <div id="historyMessage" class="message" role="status"></div>
+<section class="daily-board" aria-label="날짜별 수련생 출석 현황">
+ <div class="daily-board-head"><div><h3>📋 날짜별 출석 현황</h3><p>초록: 출석 · 파랑: 귀가 완료 · 회색: 출석 기록 없음 (결석 확정 아님)</p></div>
+ <div class="field"><label for="dailyBoardDate">확인할 날짜</label><input id="dailyBoardDate" type="date" onchange="renderDailyBoard()"></div></div>
+ <div id="dailyBoardSummary" class="daily-board-summary"></div>
+ <div id="dailyBoardGrid" class="daily-board-grid"><div class="daily-board-empty">기록 조회 버튼을 누르면 수련생별 현황이 나타납니다.</div></div>
+</section>
 <div id="historyStats" class="history-stats"></div>
 <div id="historyCalendar" class="history-calendar" hidden></div>
 <div class="history-scroll"><table class="history-table"><thead><tr><th>날짜</th><th>이름</th><th>수련반</th><th>출석</th><th>귀가</th></tr></thead><tbody id="historyRows"><tr><td colspan="5">조회 버튼을 눌러주세요.</td></tr></tbody></table></div>
@@ -1677,7 +1702,7 @@ function openAdminPage(page){
  if(!ids[page])page="home";
  for(const [key,id] of Object.entries(ids))document.getElementById(id).hidden=key!==page;
  document.querySelectorAll(".manage-nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===page));
- if(page==="history")prepareHistoryFilters();
+ if(page==="history"){prepareHistoryFilters();if(!historyLoaded)loadHistory();}
  window.scrollTo({top:0,behavior:"instant"});
 }
 function fillDojoForm(d){
@@ -1866,6 +1891,7 @@ function historyTime(v){if(!v)return '-';const d=new Date(v);return isNaN(d.getT
 function prepareHistoryFilters(){
  const from=document.getElementById('historyFrom'),to=document.getElementById('historyTo');
  if(!to.value){const now=new Date();to.value=historyLocalDate(now);from.value=to.value.slice(0,8)+'01'}
+ const bd=document.getElementById('dailyBoardDate');if(!bd.value)bd.value=historyLocalDate(new Date());
  const st=document.getElementById('historyStudent'),cls=document.getElementById('historyClass');
  const selected=st.value,selectedClass=cls.value;
  st.replaceChildren(new Option('전체 수련생',''));
@@ -1900,7 +1926,37 @@ function renderHistory(){
  for(const r of rows){const tr=document.createElement('tr');for(const val of [r.attendance_date,r.name,r.class_name||'-',historyTime(r.checked_at),historyTime(r.departed_at)]){const td=document.createElement('td');td.textContent=val;tr.appendChild(td)}tbody.appendChild(tr)}
  const cal=document.getElementById('historyCalendar');cal.hidden=!document.getElementById('historyStudent').value;
  if(!cal.hidden)renderHistoryCalendar();
+ renderDailyBoard();
 }
+
+function renderDailyBoard(){
+ const grid=document.getElementById('dailyBoardGrid'),summary=document.getElementById('dailyBoardSummary');
+ if(!grid||!summary)return;
+ grid.replaceChildren();summary.replaceChildren();
+ const day=document.getElementById('dailyBoardDate').value;
+ const from=document.getElementById('historyFrom').value,to=document.getElementById('historyTo').value;
+ if(!historyLoaded){grid.textContent='기록을 먼저 조회해주세요.';return}
+ if(!day||day<from||day>to){grid.textContent='선택한 날짜가 조회 기간 밖입니다. 시작일·종료일을 변경한 뒤 기록 조회를 눌러주세요.';return}
+ const cl=document.getElementById('historyClass').value;
+ const sid=document.getElementById('historyStudent').value;
+ const active=students.filter(x=>(!x.status||x.status==='재원')&&(!cl||x.class_name===cl)&&(!sid||String(x.id)===sid));
+ active.sort((a,b)=>String(a.name||'').localeCompare(String(b.name||''),'ko'));
+ const records=new Map(historyData.filter(r=>r.attendance_date===day).map(r=>[String(r.student_id),r]));
+ let present=0,departed=0;
+ for(const st of active){
+  const r=records.get(String(st.id));if(r){present++;if(r.departed_at)departed++}
+  const tile=document.createElement('div');tile.className='daily-board-tile'+(r?(r.departed_at?' departed':' present'):'');
+  const name=document.createElement('strong');name.textContent=st.name||'이름 없음';tile.appendChild(name);
+  const cls=document.createElement('small');cls.textContent=st.class_name||'수련반 미지정';tile.appendChild(cls);
+  const status=document.createElement('span');status.className='daily-status';
+  status.textContent=r?(r.departed_at?'귀가 완료 · '+historyTime(r.departed_at):'출석 · '+historyTime(r.checked_at)):'출석 기록 없음';tile.appendChild(status);grid.appendChild(tile);
+ }
+ for(const v of ['전체 '+active.length+'명','출석 '+present+'명','출석 기록 없음 '+(active.length-present)+'명','귀가 완료 '+departed+'명']){
+  const badge=document.createElement('span');badge.textContent=v;summary.appendChild(badge);
+ }
+ if(!active.length){grid.textContent='표시할 재원 수련생이 없습니다.'}
+}
+
 function moveHistoryMonth(delta){const [y,m]=historyMonth.split('-').map(Number);const d=new Date(y,m-1+delta,1);const key=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');const from=document.getElementById('historyFrom').value.slice(0,7),to=document.getElementById('historyTo').value.slice(0,7);if(key<from||key>to)return;historyMonth=key;renderHistoryCalendar()}
 function renderHistoryCalendar(){
  const cal=document.getElementById('historyCalendar');cal.replaceChildren();const sid=document.getElementById('historyStudent').value;if(!sid)return;
