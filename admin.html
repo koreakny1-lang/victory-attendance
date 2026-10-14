@@ -228,7 +228,7 @@ header h1{color:#fff}
 .primary{background:var(--dojo-primary,#062b5c)}
 @media(max-width:650px){.home-grid{grid-template-columns:1fr 1fr;gap:9px}.home-grid button{padding:14px;min-height:125px}.home-grid strong{font-size:16px}.manage-nav{top:68px;gap:5px}.manage-nav button{font-size:12px;padding:9px 10px}}
 
-.security-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+input[type="color"]{width:54px!important;max-width:54px!important;height:40px!important;padding:3px!important;cursor:pointer} .security-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .security-grid .full{grid-column:1/-1}
 .security-status{border-radius:10px;background:#f0f5ff;padding:12px;margin:12px 0;color:#24456c;font-size:14px}
 @media(max-width:650px){.security-grid{grid-template-columns:1fr}}
@@ -399,7 +399,7 @@ onkeydown="if(event.key==='Enter') login()">
 
 
 </div>
-<div id="pageStudents" class="admin-page" hidden>
+<div id="pageStudents" class="admin-page" hidden><section class="card" id="studentFieldSettings"><h2>🧩 수련생 관리 항목 설정</h2><p class="settings-note">기본 항목의 표시 이름과 숨김 여부를 변경하거나 새로운 항목을 추가할 수 있습니다. 이름·출석번호는 출결 처리에 필요하여 숨길 수 없습니다. 새 항목 데이터는 기존 수련생 정보와 별도로 안전하게 보관됩니다.</p><div id="fieldEditor"></div><button type="button" class="small-btn" onclick="addCustomField()">＋ 새 항목 추가</button><button type="button" class="primary" style="margin-top:12px" onclick="saveStudentFields()">항목 설정 저장</button><div id="fieldSettingsMessage" class="message"></div></section>
 <!-- 수련생 등록 -->
 <div class="card">
 
@@ -448,7 +448,7 @@ onkeydown="if(event.key==='Enter') login()">
 </div>
 
 <div class="field full">
-<button class="primary" id="addBtn" onclick="addStudent()">수련생 등록</button>
+<div id="addCustomFields" class="full" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px"></div><button class="primary" id="addBtn" onclick="addStudent()">수련생 등록</button>
 </div>
 
 </div>
@@ -551,7 +551,7 @@ oninput="renderStudents()">
 
 </div>
 
-<div class="modal-buttons">
+<div id="editCustomFields" class="form-grid" style="margin-top:14px"></div><div class="modal-buttons">
 <button class="cancel" onclick="closeEdit()">취소</button>
 <button class="primary" id="saveEditBtn" onclick="saveEdit()">수정 저장</button>
 </div>
@@ -682,6 +682,7 @@ message.textContent="";
 
 startAutoRefresh();
 loadDojoSettings();
+ loadStudentFieldSettings();
 
 }catch(error){
 
@@ -760,6 +761,7 @@ rpc("admin_today_departures",{admin_password:adminPassword}).catch(error=>{conso
 ]);
 
 students=Array.isArray(results[0])?results[0]:[];
+ await loadStudentCustomValues();
 todayAttendance=Array.isArray(results[1])?results[1]:[];
 mergeDepartures(results[2]);
 
@@ -1287,6 +1289,7 @@ return;
 
 message.className="message success";
 message.textContent=name+" 수련생 등록 완료! (출석번호 "+pin+")";
+try{const newStudent=students.find(x=>String(x.pin)===pin); await loadAll();const registered=students.find(x=>String(x.pin)===pin);if(registered)await saveStudentCustomValues(registered.id,"addCustomFields");}catch(e){console.warn("추가 항목 저장 실패",e);message.textContent+=" · 추가 항목 저장을 확인해주세요.";}
 
 [
 "name","pin","phone","birthDate",
@@ -1389,6 +1392,7 @@ info.appendChild(main);
 
 const sub=[s.class_name,s.school,s.grade,s.belt].filter(Boolean).join(" · ");
 if(sub)info.appendChild(el("div","student-sub",sub));
+const extraText=studentFieldsForDisplay().map(f=>customStudentValues[String(s.id)]?.[f.id]?f.label+": "+customStudentValues[String(s.id)][f.id]:"").filter(Boolean).join(" · ");if(extraText)info.appendChild(el("div","student-sub",extraText));
 
 
 const buttons=el("div","buttons");
@@ -1446,6 +1450,7 @@ document.getElementById("editGrade").value=s.grade||"";
 document.getElementById("editBelt").value=s.belt||"";
 document.getElementById("editStatus").value=s.status||"재원";
 
+renderStudentValueInputs("editCustomFields",s);
 document.getElementById("editMessage").textContent="";
 document.getElementById("editModal").style.display="flex";
 
@@ -1520,6 +1525,7 @@ return;
 
 }
 
+try{await saveStudentCustomValues(editingStudent.id,"editCustomFields");}catch(e){console.error(e);toast("기본 정보는 저장됐지만 추가 항목 저장에 실패했습니다.");return;}
 toast(name+" 정보를 저장했습니다.");
 closeEdit();
 await loadAll();
@@ -1739,6 +1745,83 @@ async function saveUiSettings(){
  finally{btn.disabled=false;}
 }
 loadUiSettings();
+
+
+/* 수련생 항목 사용자 정의: 기본 필드 라벨/표시, 별도 추가 필드 */
+const studentBaseFields=[
+ {key:'name',label:'이름',locked:true},{key:'pin',label:'출석번호',locked:true},
+ {key:'phone',label:'학부모 연락처'},{key:'birthDate',label:'생년월일'},
+ {key:'className',label:'수련반'},{key:'school',label:'학교'},
+ {key:'grade',label:'학년'},{key:'belt',label:'띠'}
+];
+let studentFieldConfig={base:{},extra:[]};
+let customStudentValues={};
+function safeFieldLabel(v){return String(v||'').trim().slice(0,45)}
+function studentFieldsForDisplay(){return studentFieldConfig.extra.filter(x=>x.id&&x.label&&!x.hidden)}
+function fieldControl(label,type,value,onchange){const box=document.createElement('div');box.className='field';const l=document.createElement('label');l.textContent=label;const inp=document.createElement('input');inp.type=type;inp.value=value||'';inp.addEventListener('input',()=>onchange(inp.value));box.append(l,inp);return box;}
+function renderFieldEditor(){
+ const box=document.getElementById('fieldEditor');if(!box)return;box.replaceChildren();
+ const h=document.createElement('h3');h.textContent='기본 항목';box.append(h);
+ studentBaseFields.forEach(f=>{
+  const conf=studentFieldConfig.base[f.key]||{};
+  const row=document.createElement('div');row.style.cssText='display:flex;gap:10px;align-items:center;margin:8px 0';
+  const input=document.createElement('input');input.value=conf.label||f.label;input.setAttribute('aria-label',f.label+' 표시 이름');input.oninput=()=>{studentFieldConfig.base[f.key]={...studentFieldConfig.base[f.key],label:input.value};applyStudentFieldConfig()};
+  const label=document.createElement('label');label.style.cssText='display:flex;align-items:center;gap:4px;white-space:nowrap;font-size:13px';
+  const check=document.createElement('input');check.type='checkbox';check.style.width='auto';check.checked=f.locked?true:!conf.hidden;check.disabled=!!f.locked;
+  check.onchange=()=>{studentFieldConfig.base[f.key]={...studentFieldConfig.base[f.key],hidden:!check.checked};applyStudentFieldConfig()};
+  label.append(check,document.createTextNode(f.locked?'필수':'표시'));row.append(input,label);box.append(row);
+ });
+ const h2=document.createElement('h3');h2.textContent='추가 항목';h2.style.marginTop='22px';box.append(h2);
+ studentFieldConfig.extra.forEach((f,i)=>{
+  const row=document.createElement('div');row.style.cssText='display:flex;gap:8px;align-items:center;margin:8px 0';
+  const inp=document.createElement('input');inp.value=f.label;inp.placeholder='항목 이름 (예: 차량 노선)';inp.oninput=()=>{f.label=inp.value;applyStudentFieldConfig()};
+  const label=document.createElement('label');label.style.cssText='display:flex;gap:4px;align-items:center;white-space:nowrap;font-size:13px';
+  const chk=document.createElement('input');chk.type='checkbox';chk.style.width='auto';chk.checked=!f.hidden;chk.onchange=()=>{f.hidden=!chk.checked;applyStudentFieldConfig()};label.append(chk,document.createTextNode('표시'));
+  const del=document.createElement('button');del.type='button';del.className='delete';del.textContent='삭제';del.onclick=()=>{if(confirm('이 항목을 숨기지 않고 삭제하시겠습니까? 저장된 값은 복구하기 어려울 수 있습니다.')){studentFieldConfig.extra.splice(i,1);renderFieldEditor();applyStudentFieldConfig()}};
+  row.append(inp,label,del);box.append(row);
+ });
+}
+function addCustomField(){studentFieldConfig.extra.push({id:'custom_'+crypto.randomUUID().replace(/-/g,'').slice(0,16),label:'새 항목',hidden:false});renderFieldEditor();applyStudentFieldConfig()}
+function applyStudentFieldConfig(){
+ for(const f of studentBaseFields){const c=studentFieldConfig.base[f.key]||{};for(const id of [f.key,'edit'+f.key.charAt(0).toUpperCase()+f.key.slice(1)]){
+  const input=document.getElementById(id);if(!input)continue;const wrapper=input.closest('.field');if(!wrapper)continue;
+  const label=wrapper.querySelector('label');if(label)label.textContent=(c.label||f.label)+(f.locked?' *':'');
+  wrapper.style.display=c.hidden&&!f.locked?'none':'';
+ }}
+ renderStudentValueInputs('addCustomFields');if(editingStudent)renderStudentValueInputs('editCustomFields',editingStudent);
+ renderStudents();
+}
+function renderStudentValueInputs(targetId,student){
+ const box=document.getElementById(targetId);if(!box)return;
+ const previous={};box.querySelectorAll('[data-extra-id]').forEach(x=>previous[x.dataset.extraId]=x.value);
+ box.replaceChildren();for(const f of studentFieldsForDisplay()){
+  const wrapper=document.createElement('div');wrapper.className='field';const label=document.createElement('label');label.textContent=f.label;
+  const input=document.createElement('input');input.dataset.extraId=f.id;input.maxLength=500;input.value=previous[f.id]??(student?customStudentValues[String(student.id)]?.[f.id]:'')??'';
+  wrapper.append(label,input);box.append(wrapper);
+ }
+}
+async function loadStudentFieldSettings(){
+ try{const data=await rpc('get_student_field_settings',{});studentFieldConfig={base:data?.base||{},extra:Array.isArray(data?.extra)?data.extra:[]};renderFieldEditor();applyStudentFieldConfig();}
+ catch(e){console.warn('수련생 항목 설정 조회 실패',e);}
+}
+async function saveStudentFields(){
+ const msg=document.getElementById('fieldSettingsMessage');msg.textContent='저장 중...';msg.className='message';
+ try{const labels=studentFieldConfig.extra.map(x=>safeFieldLabel(x.label));if(labels.some(x=>!x))throw Error('추가 항목 이름을 입력해 주세요.');
+ const r=await rpc('admin_save_student_field_settings',{admin_password:adminPassword,new_settings:studentFieldConfig});if(!r?.success)throw Error(r?.message||'저장 실패');
+ msg.textContent='항목 설정을 저장했습니다.';msg.className='message success';renderFieldEditor();applyStudentFieldConfig();}
+ catch(e){msg.textContent='저장 실패: '+e.message;msg.className='message error';}
+}
+async function loadStudentCustomValues(){
+ try{const r=await rpc('admin_get_student_extra_values',{admin_password:adminPassword});if(r?.success)customStudentValues=r.values||{};}
+ catch(e){console.warn('추가 항목 조회 실패',e);}
+}
+async function saveStudentCustomValues(studentId,containerId){
+ const box=document.getElementById(containerId);if(!box)return;
+ const values={...(customStudentValues[String(studentId)]||{})};
+ box.querySelectorAll('[data-extra-id]').forEach(x=>values[x.dataset.extraId]=x.value.trim());
+ const r=await rpc('admin_save_student_extra_values',{admin_password:adminPassword,p_student_id:String(studentId),new_values:values});
+ if(!r?.success)throw Error(r?.message||'추가 항목 저장 실패');customStudentValues[String(studentId)]=values;
+}
 
 /* 새로고침해도 로그인 유지 */
 const savedPw=store("get");
