@@ -232,6 +232,14 @@ input[type="color"]{width:54px!important;max-width:54px!important;height:40px!im
 .security-grid .full{grid-column:1/-1}
 .security-status{border-radius:10px;background:#f0f5ff;padding:12px;margin:12px 0;color:#24456c;font-size:14px}
 @media(max-width:650px){.security-grid{grid-template-columns:1fr}}
+
+.history-controls{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:16px 0}
+.history-controls .field input,.history-controls .field select{width:100%;min-width:0}
+.history-buttons{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.history-buttons .primary{width:auto;min-width:135px}
+.history-stats{display:flex;flex-wrap:wrap;gap:10px;margin:16px 0}.history-stats span{background:#edf3fb;border-radius:10px;padding:12px 16px;font-weight:700}
+.history-scroll{overflow-x:auto}.history-table{width:100%;border-collapse:collapse;min-width:500px;font-size:14px}.history-table th,.history-table td{border-bottom:1px solid #e5eaf1;padding:12px 8px;text-align:left}.history-table th{background:#f3f6fb;color:#324b6b}
+.history-calendar{background:#f7faff;padding:14px;border-radius:14px;margin:15px 0}.history-calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}.history-day{text-align:center;min-height:55px;border-radius:9px;padding:7px 2px;background:#fff;font-size:13px}.history-day.yes{background:#dff4e7;color:#087040;font-weight:800}.history-day small{display:block;font-size:10px;margin-top:4px}.history-day.empty{background:transparent}.history-cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:10px}
+@media(max-width:700px){.history-controls{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
 </head>
 
@@ -274,6 +282,7 @@ onkeydown="if(event.key==='Enter') login()">
 <nav class="manage-nav" aria-label="관리자 메뉴">
 <button type="button" data-page="home" onclick="openAdminPage('home')">🏠 홈</button>
 <button type="button" data-page="attendance" onclick="openAdminPage('attendance')">📋 출결 관리</button>
+<button type="button" data-page="history" onclick="openAdminPage('history')">📆 전체 출석 기록</button>
 <button type="button" data-page="students" onclick="openAdminPage('students')">👨‍🎓 수련생 관리</button>
 <button type="button" data-page="birthday" onclick="openAdminPage('birthday')">🎂 생일 관리</button>
 
@@ -285,6 +294,7 @@ onkeydown="if(event.key==='Enter') login()">
 <p class="settings-note">필요한 메뉴를 선택하면 해당 관리 화면으로 이동합니다.</p>
 <div class="home-grid">
 <button onclick="openAdminPage('attendance')">📋<strong>출결 관리</strong><span>출석·미출석 확인 및 처리</span></button>
+<button onclick="openAdminPage('history')">📆<strong>전체 출석 기록</strong><span>기간별 조회·개인별 달력</span></button>
 <button onclick="openAdminPage('students')">👨‍🎓<strong>수련생 관리</strong><span>등록·수정·명단 관리</span></button>
 <button onclick="openAdminPage('birthday')">🎂<strong>생일 관리</strong><span>이번 달 생일 확인</span></button>
 
@@ -399,6 +409,23 @@ onkeydown="if(event.key==='Enter') login()">
 </div>
 
 
+</div>
+<div id="pageHistory" class="admin-page" hidden>
+<section class="card">
+<h2>📆 전체 출석 기록</h2>
+<p class="settings-note">기간별 출석·귀가 기록을 확인하고, 수련생을 선택하면 학부모 화면처럼 개인별 출석 달력을 볼 수 있습니다. 기존 기록은 수정하지 않습니다.</p>
+<div class="history-controls">
+<div class="field"><label>시작일</label><input id="historyFrom" type="date"></div>
+<div class="field"><label>종료일</label><input id="historyTo" type="date"></div>
+<div class="field"><label>수련생</label><select id="historyStudent"><option value="">전체 수련생</option></select></div>
+<div class="field"><label>수련반</label><select id="historyClass"><option value="">전체 수련반</option></select></div>
+</div>
+<div class="history-buttons"><button type="button" class="primary" onclick="loadHistory()">🔎 기록 조회</button><button type="button" class="small-btn" onclick="downloadHistoryCsv()">📥 조회 결과 CSV</button></div>
+<div id="historyMessage" class="message" role="status"></div>
+<div id="historyStats" class="history-stats"></div>
+<div id="historyCalendar" class="history-calendar" hidden></div>
+<div class="history-scroll"><table class="history-table"><thead><tr><th>날짜</th><th>이름</th><th>수련반</th><th>출석</th><th>귀가</th></tr></thead><tbody id="historyRows"><tr><td colspan="5">조회 버튼을 눌러주세요.</td></tr></tbody></table></div>
+</section>
 </div>
 <div id="pageStudents" class="admin-page" hidden>
 <!-- 수련생 등록 -->
@@ -1646,10 +1673,11 @@ function applyDojoTheme(d){
  document.documentElement.style.setProperty("--dojo-primary",safeHex(d.primary_color,dojoDefaults.primary_color));
 }
 function openAdminPage(page){
- const ids={home:"adminHome",attendance:"pageAttendance",students:"pageStudents",birthday:"pageBirthday",program:"pageProgram",links:"pageLinks"};
+ const ids={home:"adminHome",attendance:"pageAttendance",history:"pageHistory",students:"pageStudents",birthday:"pageBirthday",program:"pageProgram",links:"pageLinks"};
  if(!ids[page])page="home";
  for(const [key,id] of Object.entries(ids))document.getElementById(id).hidden=key!==page;
  document.querySelectorAll(".manage-nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===page));
+ if(page==="history")prepareHistoryFilters();
  window.scrollTo({top:0,behavior:"instant"});
 }
 function fillDojoForm(d){
@@ -1827,6 +1855,61 @@ async function saveStudentCustomValues(studentId,containerId){
 /* 새로고침해도 로그인 유지 */
 const savedPw=store("get");
 if(savedPw)login(savedPw);
+
+
+/* 관리자 전체 출석 기록 / 개인별 달력 */
+let historyData=[];
+let historyMonth=null;
+let historyLoaded=false;
+function historyLocalDate(d){const f=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'});return f.format(d)}
+function historyTime(v){if(!v)return '-';const d=new Date(v);return isNaN(d.getTime())?'-':d.toLocaleTimeString('ko-KR',{timeZone:'Asia/Seoul',hour:'2-digit',minute:'2-digit'})}
+function prepareHistoryFilters(){
+ const from=document.getElementById('historyFrom'),to=document.getElementById('historyTo');
+ if(!to.value){const now=new Date();to.value=historyLocalDate(now);from.value=to.value.slice(0,8)+'01'}
+ const st=document.getElementById('historyStudent'),cls=document.getElementById('historyClass');
+ const selected=st.value,selectedClass=cls.value;
+ st.replaceChildren(new Option('전체 수련생',''));
+ [...students].sort((a,b)=>String(a.name||'').localeCompare(String(b.name||''),'ko')).forEach(x=>st.add(new Option(`${x.name} (${x.pin||'-'})`,String(x.id))));
+ if([...st.options].some(o=>o.value===selected))st.value=selected;
+ cls.replaceChildren(new Option('전체 수련반',''));
+ [...new Set(students.map(s=>s.class_name).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'ko')).forEach(x=>cls.add(new Option(x,x)));
+ if([...cls.options].some(o=>o.value===selectedClass))cls.value=selectedClass;
+}
+async function loadHistory(){
+ const msg=document.getElementById('historyMessage'),from=document.getElementById('historyFrom').value,to=document.getElementById('historyTo').value;
+ if(!from||!to||from>to){msg.textContent='시작일과 종료일을 확인해주세요.';return}
+ const days=(Date.parse(to+'T00:00:00Z')-Date.parse(from+'T00:00:00Z'))/86400000;
+ if(days>366){msg.textContent='한 번에 최대 367일까지만 조회할 수 있습니다.';return}
+ msg.textContent='기록을 조회하고 있습니다...';historyLoaded=false;
+ try{
+ const sid=document.getElementById('historyStudent').value;
+ const res=await rpc('admin_attendance_overview',{admin_password:adminPassword,date_from:from,date_to:to,filter_student_id:sid?Number(sid):null});
+ if(!res||res.success!==true)throw Error(res?.message||'조회 실패');
+ historyData=Array.isArray(res.records)?res.records:[];historyLoaded=true;
+ historyMonth=from.slice(0,7);
+ msg.textContent=`${historyData.length}건 조회되었습니다.`;
+ renderHistory();
+ }catch(e){console.error(e);msg.textContent='조회 실패: '+(e.message||'서버 함수를 확인해주세요.');historyData=[];renderHistory()}
+}
+function historyFiltered(){const cl=document.getElementById('historyClass').value;return historyData.filter(r=>!cl||r.class_name===cl)}
+function renderHistory(){
+ const rows=historyFiltered(),stats=document.getElementById('historyStats'),tbody=document.getElementById('historyRows');stats.replaceChildren();tbody.replaceChildren();
+ const unique=new Set(rows.map(r=>String(r.student_id)));
+ for(const t of [`출석 ${rows.length}건`,`수련생 ${unique.size}명`,`귀가 완료 ${rows.filter(r=>r.departed_at).length}건`])stats.appendChild(Object.assign(document.createElement('span'),{textContent:t}));
+ if(!rows.length){const tr=document.createElement('tr'),td=document.createElement('td');td.colSpan=5;td.textContent='해당 기간에 출석 기록이 없습니다.';tr.appendChild(td);tbody.appendChild(tr)}
+ for(const r of rows){const tr=document.createElement('tr');for(const val of [r.attendance_date,r.name,r.class_name||'-',historyTime(r.checked_at),historyTime(r.departed_at)]){const td=document.createElement('td');td.textContent=val;tr.appendChild(td)}tbody.appendChild(tr)}
+ const cal=document.getElementById('historyCalendar');cal.hidden=!document.getElementById('historyStudent').value;
+ if(!cal.hidden)renderHistoryCalendar();
+}
+function moveHistoryMonth(delta){const [y,m]=historyMonth.split('-').map(Number);const d=new Date(y,m-1+delta,1);const key=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');const from=document.getElementById('historyFrom').value.slice(0,7),to=document.getElementById('historyTo').value.slice(0,7);if(key<from||key>to)return;historyMonth=key;renderHistoryCalendar()}
+function renderHistoryCalendar(){
+ const cal=document.getElementById('historyCalendar');cal.replaceChildren();const sid=document.getElementById('historyStudent').value;if(!sid)return;
+ const [y,m]=historyMonth.split('-').map(Number);const head=document.createElement('div');head.className='history-cal-head';const prev=document.createElement('button'),next=document.createElement('button'),title=document.createElement('strong');prev.className=next.className='small-btn';prev.textContent='◀ 이전 달';next.textContent='다음 달 ▶';title.textContent=`${y}년 ${m}월`;prev.onclick=()=>moveHistoryMonth(-1);next.onclick=()=>moveHistoryMonth(1);prev.disabled=historyMonth<=document.getElementById('historyFrom').value.slice(0,7);next.disabled=historyMonth>=document.getElementById('historyTo').value.slice(0,7);head.append(prev,title,next);cal.appendChild(head);
+ const grid=document.createElement('div');grid.className='history-calendar-grid';for(const w of ['일','월','화','수','목','금','토'])grid.appendChild(Object.assign(document.createElement('div'),{textContent:w}));
+ const records=new Map(historyData.filter(r=>String(r.student_id)===sid).map(r=>[r.attendance_date,r]));const first=new Date(y,m-1,1),count=new Date(y,m,0).getDate();for(let i=0;i<first.getDay();i++){const d=document.createElement('div');d.className='history-day empty';grid.appendChild(d)}
+ for(let day=1;day<=count;day++){const key=historyMonth+'-'+String(day).padStart(2,'0'),r=records.get(key),cell=document.createElement('div');cell.className='history-day'+(r?' yes':'');cell.textContent=day;if(r){const info=document.createElement('small');info.textContent='✓ '+historyTime(r.checked_at);cell.appendChild(info);if(r.departed_at){const dep=document.createElement('small');dep.textContent='🏠 '+historyTime(r.departed_at);cell.appendChild(dep)}}grid.appendChild(cell)}cal.appendChild(grid);
+}
+function downloadHistoryCsv(){if(!historyLoaded){alert('먼저 기록을 조회해주세요.');return}const records=historyFiltered(),cols=[['날짜','attendance_date'],['이름','name'],['수련반','class_name'],['출석시간','checked_at'],['귀가시간','departed_at']];const quote=x=>'"'+String(x??'').replace(/"/g,'""')+'"';const lines=[cols.map(x=>quote(x[0])).join(',')];for(const r of records)lines.push([r.attendance_date,r.name,r.class_name||'',historyTime(r.checked_at),historyTime(r.departed_at)].map(quote).join(','));const blob=new Blob(['\ufeff'+lines.join('\r\n')],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='출석기록_'+document.getElementById('historyFrom').value+'_'+document.getElementById('historyTo').value+'.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
 
 </script>
 
