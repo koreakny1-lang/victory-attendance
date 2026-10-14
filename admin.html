@@ -370,6 +370,10 @@ onkeydown="if(event.key==='Enter') login()">
 <section class="card" id="customFieldsCard">
 <h2>🧩 수련생 정보 항목 관리</h2>
 <p class="settings-note">여기서 항목을 추가·이름 수정·표시/숨기기·순서 변경할 수 있습니다. 삭제 대신 숨기기를 사용하면 기존 입력값을 보존합니다. 변경 사항은 수련생 등록/수정 화면에 적용됩니다.</p>
+<h3 style="margin:18px 0 7px">✏️ 기존 항목 수정</h3>
+<p class="settings-note">기본 항목의 이름을 바꾸거나 표시를 끌 수 있습니다. 이름·출석번호는 필수이므로 숨길 수 없습니다. 변경한 뒤 아래 [항목 설정 저장]을 누르세요.</p>
+<div id="baseFieldRows"></div>
+<h3 style="margin:20px 0 8px">➕ 추가한 항목 관리</h3>
 <div id="customFieldRows"></div>
 <div class="form-grid" style="margin-top:15px"><div class="field"><label>새 항목 이름</label><input id="customFieldName" placeholder="예: 보호자 메모"></div><div class="field"><label>입력 형식</label><select id="customFieldType"><option value="text">짧은 글</option><option value="textarea">긴 글</option><option value="date">날짜</option><option value="number">숫자</option></select></div></div>
 <button type="button" class="small-btn" onclick="addCustomField()">＋ 항목 추가</button>
@@ -1899,12 +1903,49 @@ function downloadMonthlyCsv(){
 
 
 /* 프로그램 관리: 추가 수련생 항목 (관리자 인증 RPC) */
-let customFields=[],customValues={};
+let customFields=[],customValues={},baseFieldSettings={};
+const BASE_FIELD_DEFS=[
+ ['name','이름',true],['pin','출석번호',true],['phone','학부모 연락처',false],
+ ['birthDate','생년월일',false],['className','수련반',false],['school','학교',false],
+ ['grade','학년',false],['belt','띠',false],['status','상태',true]
+];
+const BASE_CONFIG_KEY='__victory_base_field_settings__';
+function renderBaseFieldSettings(){
+ const box=document.getElementById('baseFieldRows');if(!box)return;box.innerHTML='';
+ BASE_FIELD_DEFS.forEach(([key,original,required])=>{
+  const cfg=baseFieldSettings[key]||{};
+  const row=document.createElement('div');row.style.cssText='display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:8px 0;border-bottom:1px solid #e2e8f0';
+  const desc=document.createElement('span');desc.textContent=original;desc.style.cssText='min-width:115px;font-weight:600';
+  const name=document.createElement('input');name.value=cfg.label||original;name.setAttribute('aria-label',original+' 표시 이름');name.style.cssText='flex:1;min-width:130px';
+  name.addEventListener('input',()=>{baseFieldSettings[key]={...(baseFieldSettings[key]||{}),label:name.value};applyBaseFieldSettings();});
+  const label=document.createElement('label');label.style.cssText='display:flex;align-items:center;gap:5px';
+  const check=document.createElement('input');check.type='checkbox';check.checked=required||cfg.visible!==false;check.disabled=required;
+  check.addEventListener('change',()=>{baseFieldSettings[key]={...(baseFieldSettings[key]||{}),visible:check.checked};applyBaseFieldSettings();});
+  label.append(check,document.createTextNode(required?'필수':'표시'));row.append(desc,name,label);box.appendChild(row);
+ });
+}
+function applyBaseFieldSettings(){
+ const ids={name:['name','editName'],pin:['pin','editPin'],phone:['phone','editPhone'],birthDate:['birthDate','editBirthDate'],className:['className','editClass'],school:['school','editSchool'],grade:['grade','editGrade'],belt:['belt','editBelt'],status:['editStatus']};
+ for(const [key,original,required] of BASE_FIELD_DEFS){
+  const cfg=baseFieldSettings[key]||{};
+  for(const id of ids[key]){
+   const input=document.getElementById(id);if(!input)continue;
+   const field=input.closest('.field');if(!field)continue;
+   const label=field.querySelector('label');if(label)label.textContent=cfg.label?.trim()||original;
+   field.style.display=required||cfg.visible!==false?'':'none';
+  }
+ }
+}
+
 const fieldMsg=(v,err=false)=>{const e=document.getElementById('customFieldsMessage');e.className='message '+(err?'error':'success');e.textContent=v;};
 function fieldEscape(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 async function loadCustomFieldSettings(){
  try{const d=await rpc('admin_custom_fields',{admin_password:adminPassword});
- customFields=Array.isArray(d.fields)?d.fields:[];customValues=d.values||{};
+ const rawFields=Array.isArray(d.fields)?d.fields:[];
+ const baseEntry=rawFields.find(f=>f&&f.key===BASE_CONFIG_KEY);
+ baseFieldSettings=baseEntry&&typeof baseEntry.settings==='object'&&!Array.isArray(baseEntry.settings)?baseEntry.settings:{};
+ customFields=rawFields.filter(f=>f&&f.key!==BASE_CONFIG_KEY);customValues=d.values||{};
+ renderBaseFieldSettings();applyBaseFieldSettings();
  renderCustomFieldSettings();renderCustomInputs('customAddFields',null);
  }catch(e){console.warn(e);fieldMsg('항목 관리 서버 연결이 필요합니다. 함께 제공한 SQL을 먼저 실행해 주세요.',true);}
 }
@@ -1921,7 +1962,7 @@ function moveCustomField(i,delta){const j=i+delta;if(j<0||j>=customFields.length
 function addCustomField(){const input=document.getElementById('customFieldName');const label=input.value.trim();if(!label){fieldMsg('항목 이름을 입력해 주세요.',true);return;}if(customFields.some(f=>f.label===label)){fieldMsg('같은 이름의 항목이 있습니다.',true);return;}
  customFields.push({key:'f_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),label,type:document.getElementById('customFieldType').value,visible:true});input.value='';renderCustomFieldSettings();renderCustomInputs('customAddFields',null);fieldMsg('항목을 추가했습니다. 반드시 [항목 설정 저장]을 눌러 주세요.');}
 async function saveCustomFields(){const b=document.getElementById('customFieldsSave');if(customFields.some(f=>!f.label.trim())){fieldMsg('빈 항목 이름을 수정해 주세요.',true);return;}b.disabled=true;
- try{const r=await rpc('admin_save_custom_fields',{admin_password:adminPassword,new_fields:customFields});if(!r?.success)throw Error(r?.message||'저장 실패');fieldMsg('항목 설정이 저장되었습니다.');await loadCustomFieldSettings();}catch(e){fieldMsg('저장 실패: '+e.message,true);}finally{b.disabled=false;}}
+ try{const r=await rpc('admin_save_custom_fields',{admin_password:adminPassword,new_fields:[...customFields,{key:BASE_CONFIG_KEY,label:'기본 항목 설정',visible:false,settings:baseFieldSettings}]});if(!r?.success)throw Error(r?.message||'저장 실패');fieldMsg('항목 설정이 저장되었습니다.');await loadCustomFieldSettings();}catch(e){fieldMsg('저장 실패: '+e.message,true);}finally{b.disabled=false;}}
 function renderCustomInputs(containerId,studentId){const box=document.getElementById(containerId);if(!box)return;box.innerHTML='';const vals=studentId?(customValues[String(studentId)]||{}):{};
  customFields.filter(f=>f.visible!==false).forEach(f=>{const wrap=document.createElement('div');wrap.className='field';const label=document.createElement('label');label.textContent=f.label;const input=document.createElement(f.type==='textarea'?'textarea':'input');if(f.type!=='textarea')input.type=['date','number'].includes(f.type)?f.type:'text';input.dataset.fieldKey=f.key;input.value=vals[f.key]??'';wrap.append(label,input);box.appendChild(wrap);});}
 async function saveStudentCustomValues(studentId,containerId){const values={...(customValues[String(studentId)]||{})};document.querySelectorAll('#'+containerId+' [data-field-key]').forEach(el=>values[el.dataset.fieldKey]=el.value);
